@@ -4,15 +4,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="안녕"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/Amain_bnv"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/white"
+        app:itemIconTint="@drawable/menu_selected"
+        app:itemTextColor="@drawable/menu_selected"
+        app:itemIconSize="35dp"
+        app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/Amain_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conan"
+        android:textSize="20dp"
+        android:fontFamily="@font/suit_extrabold"
+        app:layout_constraintBottom_toBottomOf="@+id/Amain_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/Amain_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/Amain_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/Amain_toolbar" />
+
+    <FrameLayout
+        android:id="@+id/Amain_frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/Amain_bnv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Amain_toolbar">
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/Amain_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/Amain_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/Amain_toolbar"
+        app:srcCompat="@drawable/default_icon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

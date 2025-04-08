@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="conan01">#112A4C</color>
+    <color name="conan">#1F4985</color>
+    <color name="conan03">#306CC3</color>
+
+    <color name="Gray900">#1A1A1A</color>
+    <color name="Gray800">#373737</color>
+    <color name="Gray700">#5A5A5A</color>
+    <color name="Gray600">#7C7C7C</color>
+    <color name="Gray500">#A4A4A4</color>
+    <color name="Gray400">#C1C1C1</color>
+    <color name="Gray300">#DBDBDB</color>
+    <color name="Gray200">#F0F0F0</color>
+    <color name="Gray100">#F8F8F8</color>
+
+    <color name="Error">#f44336</color>
 </resources>

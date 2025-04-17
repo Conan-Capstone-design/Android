@@ -1,20 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
 
-    <TextView
-        android:id="@+id/textView2"
+    <ImageView
+        android:id="@+id/tvCharacterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="홈화면"
-        android:textSize="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="7dp"
+        android:src="@drawable/character"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/llCharacterList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCharacterTitle">
+
+        <LinearLayout
+            android:id="@+id/itemConan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ImageView
+                android:id="@+id/ivConan"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:background="@drawable/circle_border"
+                android:padding="4dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/main_conan_circle" />
+
+            <Button
+                android:id="@+id/btnConan"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_outline"
+                android:text="@string/conan"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/itemJjanggu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ImageView
+                android:id="@+id/ivJjanggu"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:background="@drawable/circle_border"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/main_jjanggu_circle" />
+
+            <Button
+                android:id="@+id/btnJjanggu"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_outline"
+                android:text="@string/jjanggu"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/itemKeroro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ImageView
+                android:id="@+id/ivKeroro"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:background="@drawable/circle_border"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/main_keroro_circle" />
+
+            <Button
+                android:id="@+id/btnKeroro"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_outline"
+                android:text="@string/keroro"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivSelectedCharacter"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="31.28dp"
+        android:background="@drawable/circle_border"
+        android:scaleType="centerCrop"
+        android:padding="7dp"
+        android:src="@drawable/main_center_circle"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llCharacterList" />
+
+    <ImageView
+        android:id="@+id/ivEQ"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/main_eq"
+        android:layout_marginTop="86dp"
+        android:elevation="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivSelectedCharacter" />
+
+    <Button
+        android:id="@+id/btnBluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_outline"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/bluetooth_connect"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter" />
+
+    <ImageView
+        android:id="@+id/tvPitchLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="56dp"
+        android:src="@drawable/pitch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBluetooth" />
+
+    <SeekBar
+        android:id="@+id/seekBarPitch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="29dp"
+        android:max="100"
+        android:progressDrawable="@drawable/rounded_seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@drawable/thumb_small"
+        android:thumbOffset="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvPitchLabel"
+        app:layout_constraintTop_toTopOf="@id/tvPitchLabel"
+        android:translationY="-7dp"/>
+
+    <TextView
+        android:id="@+id/tvPitchValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="12sp"
+        android:textColor = "@color/lightblue"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
+        app:layout_constraintStart_toStartOf="@id/seekBarPitch"/>
+
+    <ImageView
+        android:id="@+id/tvTimbreLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="56dp"
+        android:src="@drawable/timbre"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPitchLabel" />
+
+    <SeekBar
+        android:id="@+id/seekBarTimbre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:max="100"
+        android:progressDrawable="@drawable/rounded_seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@drawable/thumb_small"
+        android:thumbOffset="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvTimbreLabel"
+        app:layout_constraintTop_toTopOf="@id/tvTimbreLabel"
+        android:translationY="-7dp"/>
+
+    <TextView
+        android:id="@+id/tvTimbreValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="12sp"
+        android:textColor = "@color/blue"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
+        app:layout_constraintStart_toStartOf="@id/seekBarTimbre"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

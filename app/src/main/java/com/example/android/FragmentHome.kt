@@ -61,11 +61,9 @@ class FragmentHome: Fragment() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                // 터치를 시작할 때 필요한 동작이 있으면 여기에
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // 터치를 끝낼 때 필요한 동작이 있으면 여기에
             }
         })
 

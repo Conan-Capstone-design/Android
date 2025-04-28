@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="24dp"
@@ -10,8 +11,8 @@
         android:id="@+id/tvCharacterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:layout_marginStart="7dp"
+        android:layout_marginTop="25dp"
         android:src="@drawable/character"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,9 +42,8 @@
                 android:layout_width="74dp"
                 android:layout_height="74dp"
                 android:background="@drawable/circle_border"
-                android:padding="4dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/main_conan_circle" />
+                android:scaleType="centerInside"
+                android:src="@drawable/main_conan" />
 
             <Button
                 android:id="@+id/btnConan"
@@ -70,9 +70,8 @@
                 android:layout_width="74dp"
                 android:layout_height="74dp"
                 android:background="@drawable/circle_border"
-                android:padding="4dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/main_jjanggu_circle" />
+                android:src="@drawable/main_jjanggu" />
 
             <Button
                 android:id="@+id/btnJjanggu"
@@ -98,9 +97,8 @@
                 android:layout_width="74dp"
                 android:layout_height="74dp"
                 android:background="@drawable/circle_border"
-                android:padding="4dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/main_keroro_circle" />
+                android:src="@drawable/main_keroro" />
 
             <Button
                 android:id="@+id/btnKeroro"
@@ -119,11 +117,10 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="31.28dp"
-        android:background="@drawable/circle_border"
-        android:scaleType="centerCrop"
-        android:padding="7dp"
-        android:src="@drawable/main_center_circle"
+        android:background="@drawable/circle_border_lightblue"
         android:elevation="2dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/main_center_circle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/llCharacterList" />
@@ -132,27 +129,39 @@
         android:id="@+id/ivEQ"
         android:layout_width="380dp"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:src="@drawable/main_eq"
         android:layout_marginTop="86dp"
+        android:adjustViewBounds="true"
         android:elevation="1dp"
+        android:src="@drawable/main_eq"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/ivSelectedCharacter" />
 
-    <Button
+    <ImageButton
         android:id="@+id/btnBluetooth"
-        android:layout_width="wrap_content"
+        android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_outline"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:text="@string/bluetooth_connect"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="17dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/btn_bluetooth"
+        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter"
+
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter" />
+        android:layout_marginStart="140dp"
+          />
+
+    <ImageButton
+        android:id="@+id/btnDownload"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="15dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/btn_download"
+        app:layout_constraintStart_toEndOf="@id/btnBluetooth"
+        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter"
+
+        />
 
     <ImageView
         android:id="@+id/tvPitchLabel"
@@ -170,24 +179,36 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="29dp"
         android:max="100"
-        android:progressDrawable="@drawable/rounded_seekbar_progress"
+        android:progressDrawable="@drawable/rounded_seekbar_progress1"
         android:splitTrack="false"
         android:thumb="@drawable/thumb_small"
         android:thumbOffset="0dp"
+        android:translationY="-7dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tvPitchLabel"
-        app:layout_constraintTop_toTopOf="@id/tvPitchLabel"
-        android:translationY="-7dp"/>
+        app:layout_constraintTop_toTopOf="@id/tvPitchLabel" />
 
     <TextView
         android:id="@+id/tvPitchValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="21.7dp"
+        android:layout_marginBottom="23dp"
         android:text="0"
+        android:textStyle="bold"
+        android:textColor="@color/lightblue"
         android:textSize="12sp"
-        android:textColor = "@color/lightblue"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
+        app:layout_constraintStart_toStartOf="@id/seekBarPitch" />
+
+    <ImageView
+        android:id="@+id/ivPitchArrow"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/arrow"
+        app:tint="@color/lightblue"
         app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
         app:layout_constraintStart_toStartOf="@id/seekBarPitch"/>
 
@@ -207,24 +228,36 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
         android:max="100"
-        android:progressDrawable="@drawable/rounded_seekbar_progress"
+        android:progressDrawable="@drawable/rounded_seekbar_progress2"
         android:splitTrack="false"
         android:thumb="@drawable/thumb_small"
         android:thumbOffset="0dp"
+        android:translationY="-7dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tvTimbreLabel"
-        app:layout_constraintTop_toTopOf="@id/tvTimbreLabel"
-        android:translationY="-7dp"/>
+        app:layout_constraintTop_toTopOf="@id/tvTimbreLabel" />
 
     <TextView
         android:id="@+id/tvTimbreValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="21.7dp"
+        android:layout_marginBottom="23dp"
         android:text="0"
+        android:textColor="@color/blue"
         android:textSize="12sp"
-        android:textColor = "@color/blue"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="10dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
+        app:layout_constraintStart_toStartOf="@id/seekBarTimbre" />
+
+    <ImageView
+        android:id="@+id/ivTimbreArrow"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/arrow"
+        app:tint="@color/blue"
         app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
         app:layout_constraintStart_toStartOf="@id/seekBarTimbre"/>
 

@@ -24,7 +24,7 @@ class FragmentHome: Fragment() {
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        binding.tvPitchValue.text = binding.seekBarTimbre.progress.toString()
+        binding.tvPitchValue.text = binding.seekBarPitch.progress.toString()
         binding.tvTimbreValue.text = binding.seekBarTimbre.progress.toString()
 
         binding.seekBarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -36,7 +36,9 @@ class FragmentHome: Fragment() {
                     val thumbX = sb.paddingLeft + available * progress / sb.max
                     // TextView 중앙이 Thumb 위로 오도록 보정
                     val textView = binding.tvPitchValue
-                    textView.x = sb.x + thumbX - textView.width / 2f
+                    textView.x = sb.x + thumbX + 5f - textView.width / 2f
+                    val arrow = binding.ivPitchArrow
+                    arrow.x = sb.x + thumbX + 5f- arrow.width / 2f
                 }
             }
 
@@ -45,7 +47,6 @@ class FragmentHome: Fragment() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // 터치를 끝낼 때 필요한 동작이 있으면 여기에
             }
         })
 
@@ -56,7 +57,9 @@ class FragmentHome: Fragment() {
                     val available = sb.width - sb.paddingLeft - sb.paddingRight
                     val thumbX = sb.paddingLeft + available * progress / sb.max
                     val textView = binding.tvTimbreValue
-                    textView.x = sb.x + thumbX - textView.width / 2f
+                    textView.x = sb.x + thumbX + 5f - textView.width / 2f
+                    val arrow = binding.ivTimbreArrow
+                    arrow.x = sb.x + thumbX + 5f - arrow.width / 2f
                 }
             }
 
@@ -69,9 +72,12 @@ class FragmentHome: Fragment() {
 
         val dimColor = Color.parseColor("#77000000")
         val selectColor = ContextCompat.getColor(requireContext(), R.color.lightblue)
-        val selectTint   = ColorStateList.valueOf(selectColor)
+        val conanColor = ContextCompat.getColor(requireContext(), R.color.conan)
+
 
         val imageViews = listOf(binding.ivJjanggu, binding.ivConan, binding.ivKeroro)
+        val buttons = listOf(binding.btnJjanggu, binding.btnConan, binding.btnKeroro)
+
         imageViews.forEach { iv ->
             iv.setColorFilter(dimColor, PorterDuff.Mode.SRC_ATOP)
             iv.backgroundTintList = null
@@ -81,28 +87,50 @@ class FragmentHome: Fragment() {
             binding.btnConan to binding.ivConan,
             binding.btnKeroro to binding.ivKeroro
         )
+
         val defaultCenterRes = R.drawable.main_center_circle
         var selectedIv: ImageView? = null
 
         buttonToIv.forEach { (btn, iv) ->
             btn.setOnClickListener {
                 if (selectedIv == iv) {
+                    //선택 해제
                     imageViews.forEach {
                         it.setColorFilter(dimColor, PorterDuff.Mode.SRC_ATOP)
                         it.backgroundTintList = null
+                        it.setBackgroundResource(R.drawable.circle_border)
                     }
+                    buttons.forEach {
+                        it.setBackgroundResource(R.drawable.button_outline) // 버튼 배경 초기화
+                    }
+                    binding.ivEQ.setColorFilter(null) // 기본 색 복원
+                    binding.btnBluetooth.setColorFilter(null)
+                    binding.btnDownload.setColorFilter(null)
+
                     binding.ivSelectedCharacter.setImageResource(defaultCenterRes)
-                    binding.ivSelectedCharacter.backgroundTintList = null
+                    binding.ivSelectedCharacter.setBackgroundResource(R.drawable.circle_border)
                     selectedIv = null
                 } else {
+                    //모두 초기화
                     imageViews.forEach {
                         it.setColorFilter(dimColor, PorterDuff.Mode.SRC_ATOP)
                         it.backgroundTintList = null
+                        it.setBackgroundResource(R.drawable.circle_border)
+                    }
+                    buttons.forEach {
+                        it.setBackgroundResource(R.drawable.button_outline)
                     }
                     iv.clearColorFilter()
-                    iv.backgroundTintList = selectTint
+                    iv.setBackgroundResource(R.drawable.circle_border_lightblue)
+
+                    btn.setBackgroundResource(R.drawable.button_outline_lightblue)
+
+                    binding.ivEQ.setColorFilter(selectColor)
+                    binding.btnBluetooth.setColorFilter(conanColor)
+                    binding.btnDownload.setColorFilter(conanColor)
+
                     binding.ivSelectedCharacter.setImageDrawable(iv.drawable)
-                    binding.ivSelectedCharacter.backgroundTintList = selectTint
+                    binding.ivSelectedCharacter.setBackgroundResource(R.drawable.circle_border_lightblue)
                     selectedIv = iv
                 }
             }

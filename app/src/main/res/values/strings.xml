@@ -7,4 +7,5 @@
     <string name="bluetooth_connect">블루투스 연동하기</string>
     <string name="pitch">Pitch</string>
     <string name="timbre">Timbre</string>
+    <string name="underlined_text"><u>회원가입 하기</u></string>
 </resources>

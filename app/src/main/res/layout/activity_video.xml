@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/Video_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_convert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="영상 변환하기"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/Video_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/Video_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/Video_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/Video_toolbar" />
+
+    <ImageButton
+        android:id="@+id/ib_arrow_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src = "@drawable/ic_arrow_back"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="17dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/Video_toolbar"
+        app:layout_constraintBottom_toBottomOf="@+id/Video_toolbar"/>
+
+    <FrameLayout
+        android:id="@+id/Video_frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Video_toolbar">
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

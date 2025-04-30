@@ -25,6 +25,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".VideoActivity"
+            android:exported="false"/>
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

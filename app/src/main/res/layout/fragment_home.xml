@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/character"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +35,7 @@
             android:layout_marginEnd="10dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/ivConan"
@@ -63,7 +63,7 @@
             android:layout_marginEnd="10dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/ivJjanggu"
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/ivKeroro"
@@ -113,54 +113,39 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/ivSelectedCharacter"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="31.28dp"
-        android:background="@drawable/circle_border_lightblue"
-        android:elevation="2dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/main_center_circle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llCharacterList" />
-
-    <ImageView
         android:id="@+id/ivEQ"
         android:layout_width="380dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="86dp"
         android:adjustViewBounds="true"
-        android:elevation="1dp"
         android:src="@drawable/main_eq"
+        app:layout_constraintBottom_toBottomOf="@+id/ivSelectedCharacter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/ivSelectedCharacter" />
 
-    <ImageButton
-        android:id="@+id/btnBluetooth"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="17dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/btn_bluetooth"
-        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivSelectedCharacter"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:layout_marginTop="21dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/CircleImage"
+        android:background="@color/conan"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="140dp"
-          />
+        app:layout_constraintTop_toBottomOf="@id/llCharacterList" />
 
-    <ImageButton
-        android:id="@+id/btnDownload"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="17dp"
-        android:layout_marginStart="15dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/btn_download"
-        app:layout_constraintStart_toEndOf="@id/btnBluetooth"
-        app:layout_constraintTop_toBottomOf="@id/ivSelectedCharacter"
-
-        />
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivSelectedCharacter02"
+        android:layout_width="156dp"
+        android:layout_height="156dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/a_conan"
+        app:layout_constraintBottom_toBottomOf="@+id/ivSelectedCharacter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ivSelectedCharacter"
+        app:shapeAppearanceOverlay="@style/CircleImage" />
 
     <ImageView
         android:id="@+id/tvPitchLabel"
@@ -170,7 +155,7 @@
         android:layout_marginTop="56dp"
         android:src="@drawable/pitch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBluetooth" />
+        app:layout_constraintTop_toBottomOf="@id/btn_layout" />
 
     <SeekBar
         android:id="@+id/seekBarPitch"
@@ -259,5 +244,35 @@
         app:tint="@color/blue"
         app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
         app:layout_constraintStart_toStartOf="@id/seekBarTimbre"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        app:layout_constraintEnd_toEndOf="@+id/ivSelectedCharacter"
+        app:layout_constraintStart_toStartOf="@+id/ivSelectedCharacter"
+        app:layout_constraintTop_toBottomOf="@+id/ivSelectedCharacter">
+
+        <ImageButton
+            android:id="@+id/btnBluetooth"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_bluetooth"
+            app:layout_constraintEnd_toStartOf="@+id/btnDownload"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnDownload"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_download"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#F5F5F5">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,6 +32,7 @@
             android:textSize="20sp"
             android:textColor="@color/black"
             android:gravity="center"
+            android:fontFamily="@font/suit_medium"
             android:layout_marginStart="45dp"
             android:layout_marginEnd="50dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +65,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingHorizontal="27dp"
-            android:paddingVertical="14dp" />
+            android:paddingVertical="14dp"
+            tools:listitem="@layout/item_aimessage"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -87,8 +90,9 @@
             android:paddingStart="20dp"
             android:paddingEnd="42dp"
             android:singleLine="true"
+            android:fontFamily="@font/suit_regular"
             android:background="@drawable/shape_whiteroundbox"
-            android:textColor="@color/black"
+            android:textColor="@color/Gray800"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -98,7 +102,7 @@
             android:id="@+id/btn_chat_send"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:src="@drawable/ic_send"
+            android:src="@drawable/ic__send"
             android:layout_marginEnd="12dp"
             app:layout_constraintEnd_toEndOf="@id/chat_input_et"
             app:layout_constraintTop_toTopOf="@id/chat_input_et"

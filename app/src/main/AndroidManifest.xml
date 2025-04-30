@@ -42,6 +42,9 @@
         <activity
             android:name=".AgreeServiceActivity"
             android:exported="false" />
+        <activity
+            android:name=".CharacterChatActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

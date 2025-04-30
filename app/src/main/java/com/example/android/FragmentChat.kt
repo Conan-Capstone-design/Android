@@ -1,5 +1,6 @@
 package com.example.android
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +50,17 @@ class FragmentChat: Fragment() {
             )
         }
 
+        binding.imageView11.setOnClickListener {
+            if (selectedCharacterIndex == 0) {
+                // 아무 캐릭터도 선택되지 않으면 화면 전환 안 함
+                return@setOnClickListener
+            }
+
+            val characterName = binding.character.text.toString()
+            val intent = Intent(requireContext(), CharacterChatActivity::class.java)
+            intent.putExtra("character_name", characterName)
+            startActivity(intent)
+        }
         return binding.root
     }
 

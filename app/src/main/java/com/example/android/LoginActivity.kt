@@ -18,5 +18,9 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        binding.textView16.setOnClickListener {
+            val intent = Intent(this, AgreefirstActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

@@ -45,6 +45,9 @@
         <activity
             android:name=".CharacterChatActivity"
             android:exported="false" />
+        <activity
+            android:name=".ChatlistActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

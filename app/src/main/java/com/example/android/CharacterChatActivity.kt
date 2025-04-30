@@ -3,6 +3,7 @@ package com.example.android
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.databinding.ActivityAgree2Binding
 import com.example.android.databinding.ActivityAgree3Binding
@@ -19,9 +20,16 @@ class CharacterChatActivity : AppCompatActivity() {
         binding.chatCharacter.text = characterName // 예시로 TextView에 표시
 
         binding.chatBackBtn.setOnClickListener {
-            finish()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            intent.putExtra("start_fragment", R.id.bnv_chat)
+            startActivity(intent)
         }
 
+        binding.chatChatlistBtn.setOnClickListener {
+            val intent = Intent(this, ChatlistActivity::class.java)
+            startActivity(intent)
+        }
         val messageAdapter = MessageAdapter()
         binding.chatRv.layoutManager = LinearLayoutManager(this)
         binding.chatRv.adapter = messageAdapter

@@ -14,11 +14,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initBottomNavigation()
-        // 초기 화면을 홈 프래그먼트로 설정
+
+        val startFragmentId = intent.getIntExtra("start_fragment", R.id.bnv_home)
+        bottomNavigationView.selectedItemId = startFragmentId
+
         if (savedInstanceState == null) {
+            val fragment = when (startFragmentId) {
+                R.id.bnv_chat -> FragmentChat()
+                R.id.bnv_tts -> FragmentTTS()
+                R.id.bnv_mypage -> FragmentMypage()
+                else -> FragmentHome()
+            }
             supportFragmentManager
                 .beginTransaction()
-                .replace(binding.AmainFrame.id, FragmentHome())
+                .replace(binding.AmainFrame.id, fragment)
                 .commitAllowingStateLoss()
         }
     }

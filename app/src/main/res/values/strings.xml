@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Conan</string>
+    <string name="character_title">Character</string>
+    <string name="conan">코난</string>
+    <string name="jjanggu">짱구</string>
+    <string name="keroro">케로로</string>
+    <string name="bluetooth_connect">블루투스 연동하기</string>
+    <string name="pitch">Pitch</string>
+    <string name="timbre">Timbre</string>
 </resources>

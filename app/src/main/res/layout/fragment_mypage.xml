@@ -11,7 +11,7 @@
         android:id="@+id/mypage"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="20dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,6 +128,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/secession"
         app:srcCompat="@drawable/btn_ic_right" />
+    <ImageView
+        android:id="@+id/imageVielogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/logout"
+        app:srcCompat="@drawable/btn_ic_right" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/characterlist"
@@ -197,15 +206,28 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/secession"
+    android:id="@+id/secession"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="17dp"
+    android:layout_marginTop="16dp"
+    android:fontFamily="@font/suit_bold"
+    android:text="회원탈퇴"
+    android:textColor="@color/Gray900"
+    android:textSize="16dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/characterlist" />
+
+    <TextView
+        android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:fontFamily="@font/suit_bold"
-        android:text="회원탈퇴"
+        android:text="로그아웃"
         android:textColor="@color/Gray900"
         android:textSize="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/characterlist" />
+        app:layout_constraintTop_toBottomOf="@+id/secession" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.example.android
 
+import android.app.TaskStackBuilder
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +20,22 @@ class FragmentMypage: Fragment() {
     ): View? {
         binding = FragmentMypageBinding.inflate(inflater, container, false)
 
+        binding.imageViesecession.setOnClickListener {
+            val intent = Intent(requireContext(), SecessionActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.imageView13.setOnClickListener {
+            val intent = Intent(requireContext(), MypageProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.imageVielogout.setOnClickListener {
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            val stackBuilder = TaskStackBuilder.create(requireContext())
+            stackBuilder.addNextIntentWithParentStack(intent)
+            stackBuilder.startActivities()
+        }
         return binding.root
     }
 }

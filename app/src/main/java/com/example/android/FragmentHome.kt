@@ -1,5 +1,6 @@
 package com.example.android
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -26,6 +27,7 @@ class FragmentHome: Fragment() {
 
         binding.tvPitchValue.text = binding.seekBarPitch.progress.toString()
         binding.tvTimbreValue.text = binding.seekBarTimbre.progress.toString()
+        binding.btnDownload.isEnabled = false
 
         binding.seekBarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -103,6 +105,7 @@ class FragmentHome: Fragment() {
                     buttons.forEach {
                         it.setBackgroundResource(R.drawable.button_outline) // 버튼 배경 초기화
                     }
+                    binding.btnDownload.isEnabled = false
                     binding.ivEQ.setColorFilter(null) // 기본 색 복원
                     binding.btnBluetooth.setColorFilter(null)
                     binding.btnDownload.setColorFilter(null)
@@ -110,6 +113,7 @@ class FragmentHome: Fragment() {
                     binding.ivSelectedCharacter.setImageResource(defaultCenterRes)
                     binding.ivSelectedCharacter.setBackgroundResource(R.drawable.circle_border)
                     selectedIv = null
+
                 } else {
                     //모두 초기화
                     imageViews.forEach {
@@ -124,6 +128,7 @@ class FragmentHome: Fragment() {
                     iv.setBackgroundResource(R.drawable.circle_border_lightblue)
 
                     btn.setBackgroundResource(R.drawable.button_outline_lightblue)
+                    binding.btnDownload.isEnabled = true
 
                     binding.ivEQ.setColorFilter(selectColor)
                     binding.btnBluetooth.setColorFilter(conanColor)
@@ -133,6 +138,14 @@ class FragmentHome: Fragment() {
                     binding.ivSelectedCharacter.setBackgroundResource(R.drawable.circle_border_lightblue)
                     selectedIv = iv
                 }
+            }
+        }
+
+        binding.btnDownload.setOnClickListener {
+            if (binding.btnDownload.isEnabled) {
+                // 활성화 되어 있을 때만 VideoActivity 이동
+                val intent = Intent(requireContext(), VideoActivity::class.java)
+                startActivity(intent)
             }
         }
 

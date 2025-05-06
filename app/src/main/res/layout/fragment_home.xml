@@ -215,7 +215,7 @@
         android:layout_width="156dp"
         android:layout_height="156dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/a_conan"
+        android:src="@drawable/main_center_circle"
         app:layout_constraintBottom_toBottomOf="@+id/ivSelectedCharacter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -162,7 +162,7 @@ class VideoActivity : AppCompatActivity() {
         videoPickerLauncher.launch(intent)
     }
 
-    // 비디오 삭제 함수 (업로드된 영상 및 관련 상태 초기화)
+    // 비디오 삭제 함수(업로드된 영상 및 관련 상태 초기화)
     private fun deleteUploadedVideo() {
         selectedVideoUri = null
         convertedVideoUri = null

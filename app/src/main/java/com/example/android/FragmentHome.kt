@@ -1,5 +1,6 @@
 package com.example.android
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -14,10 +15,15 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.android.databinding.FragmentHomeBinding
+import android.bluetooth.BluetoothAdapter
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 class FragmentHome: Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private var selectedCharacterIndex = 0
+    private lateinit var enableBluetoothLauncher: ActivityResultLauncher<Intent>
 
 
     override fun onCreateView(
@@ -106,6 +112,34 @@ class FragmentHome: Fragment() {
                 // 활성화 되어 있을 때만 VideoActivity 이동
                 val intent = Intent(requireContext(), VideoActivity::class.java)
                 startActivity(intent)
+            }
+        }
+
+        // Bluetooth 활성화 결과 처리
+        enableBluetoothLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // 블루투스가 성공적으로 켜졌다면 블루투스 설정 화면으로 이동
+                val intent = Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS)
+                startActivity(intent)
+            } else {
+                Toast.makeText(requireContext(), "블루투스가 활성화되지 않았습니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnBluetooth.setOnClickListener {
+            val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+            if (bluetoothAdapter == null) {
+                Toast.makeText(requireContext(), "블루투스를 지원하지 않는 기기입니다", Toast.LENGTH_SHORT).show()
+            } else {
+                if (!bluetoothAdapter.isEnabled) {
+                    // 블루투스가 꺼져 있으면 켜기 요청
+                    val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    enableBluetoothLauncher.launch(enableBtIntent)
+                } else {
+                    // 블루투스가 이미 켜져 있으면 설정 화면 이동
+                    val intent = Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS)
+                    startActivity(intent)
+                }
             }
         }
 

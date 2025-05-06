@@ -155,9 +155,12 @@ class FragmentHome: Fragment() {
 
         val tintColor = ContextCompat.getColor(requireContext(), if (newIndex != 0) R.color.conan else R.color.Gray400)
         val tint = ColorStateList.valueOf(tintColor)
+        val eqColor = ContextCompat.getColor(requireContext(), if (newIndex != 0) R.color.conan03 else R.color.Gray1000)
+        val eqtint = ColorStateList.valueOf(eqColor)
 
         binding.btnDownload.imageTintList = tint
         binding.btnBluetooth.imageTintList = tint
+        binding.ivEQ.imageTintList = eqtint
     }
 
     private fun resetCheckState(
@@ -170,8 +173,10 @@ class FragmentHome: Fragment() {
         title.setBackgroundResource(R.drawable.roundtab__character_title)
         title.setTextColor(ContextCompat.getColor(requireContext(), R.color.Gray800))
         val defaultTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray400))
+        val defaultEq = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray1000))
         binding.btnDownload.imageTintList = defaultTint
         binding.btnBluetooth.imageTintList = defaultTint
+        binding.ivEQ.imageTintList = defaultEq
     }
 
 }

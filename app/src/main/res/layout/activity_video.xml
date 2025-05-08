@@ -11,42 +11,288 @@
         android:layout_height="59dp"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/tv_convert"
+        android:id="@+id/tv_convert_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="영상 변환하기"
         android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/Video_toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/Video_toolbar"
-        app:layout_constraintStart_toStartOf="@+id/Video_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/Video_toolbar" />
+        app:layout_constraintTop_toTopOf="@id/Video_toolbar"
+        app:layout_constraintBottom_toBottomOf="@id/Video_toolbar"
+        app:layout_constraintStart_toStartOf="@id/Video_toolbar"
+        app:layout_constraintEnd_toEndOf="@id/Video_toolbar" />
 
     <ImageButton
         android:id="@+id/ib_arrow_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src = "@drawable/ic_arrow_back"
+        android:src="@drawable/ic_arrow_back"
         android:background="@android:color/transparent"
         android:layout_marginStart="17dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Video_toolbar"
-        app:layout_constraintBottom_toBottomOf="@+id/Video_toolbar"/>
+        app:layout_constraintTop_toTopOf="@id/Video_toolbar"
+        app:layout_constraintBottom_toBottomOf="@id/Video_toolbar"/>
 
-    <FrameLayout
-        android:id="@+id/Video_frame"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <TextView
+        android:id="@+id/tv_upload_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="영상 업로드"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="40dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Video_toolbar">
+        app:layout_constraintTop_toBottomOf="@id/Video_toolbar"
+        android:layout_marginStart="18dp"
+        />
 
-    </FrameLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_upload"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@drawable/video_outline"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_upload_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tv_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="파일 업로드"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_upload"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="5dp"/>
+
+        <ImageView
+            android:id="@+id/iv_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_upload"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_upload"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingStart="5dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/videoContainer"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        app:layout_constraintTop_toTopOf="@id/btn_upload"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <VideoView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/btnPlayVideo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_play"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/btnPauseVideo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_pause"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/btnDeleteVideo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_close"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_converted_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="변환된 영상"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btn_upload"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="40dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_save"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@drawable/video_outline"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_converted_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="파일 저장하기"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_save"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:paddingEnd="4dp" />
+
+        <ImageView
+            android:id="@+id/iv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_download"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_save"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingStart="4dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/videoContainer2"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_converted_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <VideoView
+            android:id="@+id/videoView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/btnPlayVideo2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_play"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/btnPauseVideo2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_pause"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_convert"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/video_button_disabled"
+        android:clickable="true"
+        android:focusable="true"
+        android:enabled="false"
+        android:foreground="?attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tv_convert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="동영상 음성 변환하기"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:fontFamily="@font/suit_bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/toast_downmsg"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/toast_background"
+        android:text="영상이 저장되었습니다"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginStart="26dp"
+        android:layout_marginEnd="26dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

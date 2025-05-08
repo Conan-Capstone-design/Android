@@ -195,7 +195,8 @@ class FragmentHome : Fragment() {
 
         binding.btnDownload.imageTintList = ColorStateList.valueOf(tintColor)
         binding.btnBluetooth.imageTintList = ColorStateList.valueOf(tintColor)
-        binding.ivEQ.imageTintList = ColorStateList.valueOf(eqColor)
+//        binding.ivEQ.imageTintList = ColorStateList.valueOf(eqColor)
+        binding.ivEQ.setImageResource(R.drawable.graphic_eq_blue)
     }
 
     private fun resetCheckState(layout: ImageView, background: View, title: TextView) {

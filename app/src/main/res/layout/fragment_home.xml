@@ -21,14 +21,13 @@
         android:id="@+id/character01_layout"
         android:layout_width="74dp"
         android:layout_height="74dp"
-        android:layout_marginStart="38dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="20dp"
+        android:background="@color/conan01"
         android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="@+id/tvCharacterTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:shapeAppearanceOverlay="@style/CircleImage"
-        android:background="@color/conan01">
-    </com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character01"
@@ -77,14 +76,13 @@
         android:id="@+id/character02_layout"
         android:layout_width="74dp"
         android:layout_height="74dp"
+        android:layout_marginStart="33dp"
         android:layout_marginTop="20dp"
         android:background="@color/conan01"
         android:scaleType="centerCrop"
-        app:layout_constraintEnd_toStartOf="@+id/character03_layout"
         app:layout_constraintStart_toEndOf="@+id/character01_layout"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:shapeAppearanceOverlay="@style/CircleImage">
-    </com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character02"
@@ -134,14 +132,13 @@
         android:id="@+id/character03_layout"
         android:layout_width="74dp"
         android:layout_height="74dp"
-        android:layout_marginEnd="38dp"
+        android:layout_marginStart="33dp"
         android:layout_marginTop="20dp"
         android:background="@color/conan01"
         android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/character02_layout"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:shapeAppearanceOverlay="@style/CircleImage">
-    </com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character03"

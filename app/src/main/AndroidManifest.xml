@@ -63,6 +63,12 @@
         <activity
             android:name=".MypageProfileActivity"
             android:exported="false" />
+        <activity
+            android:name=".MypageSaveActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MypageRecordActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

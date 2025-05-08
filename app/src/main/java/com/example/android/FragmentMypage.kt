@@ -30,6 +30,11 @@ class FragmentMypage: Fragment() {
             startActivity(intent)
         }
 
+        binding.imageView17.setOnClickListener {
+            val intent = Intent(requireContext(), MypageSaveActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.imageVielogout.setOnClickListener {
             val intent = Intent(requireContext(), LoginActivity::class.java)
             val stackBuilder = TaskStackBuilder.create(requireContext())

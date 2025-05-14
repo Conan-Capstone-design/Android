@@ -1,0 +1,24 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- 배경 트랙 -->
+  <item android:id="@android:id/background">
+    <shape android:shape="rectangle">
+      <size android:width="247dp" android:height="37dp"/>
+      <corners android:radius="50dp" />
+      <solid android:color="@color/Gray400" />
+    </shape>
+  </item>
+
+  <!-- 진행된 부분 -->
+  <item android:id="@android:id/progress">
+    <scale
+        android:scaleWidth="85%"
+        android:scaleHeight="true"
+        android:scaleGravity="left">
+      <shape android:shape="rectangle">
+        <size android:height="37dp"/>
+        <corners android:radius="50dp" />
+        <solid android:color="@color/conan03" />
+      </shape>
+    </scale>
+  </item>
+</layer-list>

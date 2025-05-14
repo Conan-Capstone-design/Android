@@ -2,6 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="black01">#000000</color>
+    <color name="black02">#333333</color>
 
     <color name="conan01">#112A4C</color>
     <color name="conan">#1F4985</color>

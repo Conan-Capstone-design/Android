@@ -7,13 +7,16 @@
     android:paddingStart="24dp"
     android:paddingEnd="24dp">
 
-    <ImageView
+    <TextView
         android:id="@+id/tvCharacterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
         android:layout_marginTop="10dp"
-        android:src="@drawable/character"
+        android:fontFamily="@font/suit_semibold"
+        android:text="Character"
+        android:textSize="20dp"
+        android:textColor="@color/black01"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -221,13 +224,17 @@
         app:layout_constraintTop_toTopOf="@+id/ivSelectedCharacter"
         app:shapeAppearanceOverlay="@style/CircleImage" />
 
-    <ImageView
+    <!--피치-->
+    <TextView
         android:id="@+id/tvPitchLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="56dp"
-        android:src="@drawable/pitch"
+        android:fontFamily="@font/suit_bold"
+        android:text="Pitch"
+        android:textSize="16dp"
+        android:textColor="@color/black01"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_layout" />
 
@@ -235,48 +242,63 @@
         android:id="@+id/seekBarPitch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="29dp"
+        android:layout_marginStart="25dp"
         android:max="100"
-        android:progressDrawable="@drawable/rounded_seekbar_progress1"
+        android:progressDrawable="@drawable/seekbar"
         android:splitTrack="false"
-        android:thumb="@drawable/thumb_small"
-        android:thumbOffset="0dp"
+        android:thumb="@drawable/thumb"
+        android:thumbOffset="-3dp"
         android:translationY="-7dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tvPitchLabel"
         app:layout_constraintTop_toTopOf="@id/tvPitchLabel" />
 
+    <ImageView
+        android:id="@+id/ivThumbAnchor"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:visibility="invisible"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_marginLeft="25dp"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintTop_toTopOf="@id/seekBarPitch"
+        app:layout_constraintBottom_toBottomOf="@id/seekBarPitch"
+        app:layout_constraintStart_toStartOf="@id/seekBarPitch" />
+
     <TextView
         android:id="@+id/tvPitchValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="21.7dp"
-        android:layout_marginBottom="23dp"
         android:text="0"
-        android:textStyle="bold"
+        android:fontFamily="@font/suit_bold"
         android:textColor="@color/lightblue"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
-        app:layout_constraintStart_toStartOf="@id/seekBarPitch" />
+        android:textSize="13dp"
+        app:layout_constraintBottom_toTopOf="@id/ivPitchArrow"
+        app:layout_constraintStart_toStartOf="@id/ivPitchArrow"
+        app:layout_constraintEnd_toEndOf="@id/ivPitchArrow" />
 
     <ImageView
         android:id="@+id/ivPitchArrow"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="13dp"
-        android:layout_marginBottom="5dp"
-        android:src="@drawable/arrow"
-        app:tint="@color/lightblue"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/arrow_lightblue"
         app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
-        app:layout_constraintStart_toStartOf="@id/seekBarPitch"/>
+        app:layout_constraintStart_toStartOf="@id/ivThumbAnchor"
+        app:layout_constraintEnd_toEndOf="@id/ivThumbAnchor"/>
 
-    <ImageView
+    <!--팀버-->
+    <TextView
         android:id="@+id/tvTimbreLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="56dp"
-        android:src="@drawable/timbre"
+        android:layout_marginTop="54dp"
+        android:fontFamily="@font/suit_bold"
+        android:text="Timbre"
+        android:textSize="16dp"
+        android:textColor="@color/black01"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPitchLabel" />
 
@@ -284,40 +306,51 @@
         android:id="@+id/seekBarTimbre"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="11dp"
         android:max="100"
-        android:progressDrawable="@drawable/rounded_seekbar_progress2"
+        android:progressDrawable="@drawable/seekbar_blue"
         android:splitTrack="false"
-        android:thumb="@drawable/thumb_small"
-        android:thumbOffset="0dp"
+        android:thumb="@drawable/thumb"
+        android:thumbOffset="-3dp"
         android:translationY="-7dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tvTimbreLabel"
         app:layout_constraintTop_toTopOf="@id/tvTimbreLabel" />
 
+    <ImageView
+        android:id="@+id/ivTimbreAnchor"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:visibility="invisible"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_marginLeft="25dp"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintTop_toTopOf="@id/seekBarTimbre"
+        app:layout_constraintBottom_toBottomOf="@id/seekBarTimbre"
+        app:layout_constraintStart_toStartOf="@id/seekBarTimbre" />
+
     <TextView
         android:id="@+id/tvTimbreValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="21.7dp"
-        android:layout_marginBottom="23dp"
         android:text="0"
         android:textColor="@color/blue"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
-        app:layout_constraintStart_toStartOf="@id/seekBarTimbre" />
+        android:textSize="13sp"
+        android:fontFamily="@font/suit_bold"
+        app:layout_constraintBottom_toTopOf="@id/ivTimbreArrow"
+        app:layout_constraintStart_toStartOf="@id/ivTimbreArrow"
+        app:layout_constraintEnd_toEndOf="@id/ivTimbreArrow" />
 
     <ImageView
         android:id="@+id/ivTimbreArrow"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="13dp"
-        android:layout_marginBottom="5dp"
-        android:src="@drawable/arrow"
-        app:tint="@color/blue"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/arrow_blue"
         app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
-        app:layout_constraintStart_toStartOf="@id/seekBarTimbre"/>
+        app:layout_constraintStart_toStartOf="@id/ivThumbAnchor"
+        app:layout_constraintEnd_toEndOf="@id/ivThumbAnchor"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_layout"

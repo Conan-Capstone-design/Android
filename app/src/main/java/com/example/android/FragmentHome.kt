@@ -56,6 +56,7 @@ class FragmentHome : Fragment() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvPitchValue.text = progress.toString()
                 seekBar?.let {
+                    if (!isAdded) return@let
                     val insetPx = 15 * resources.displayMetrics.density
                     val available = it.width - it.paddingLeft - it.paddingRight - (2 * insetPx)
                     val thumbX = it.paddingLeft + insetPx + available * progress / it.max
@@ -78,6 +79,7 @@ class FragmentHome : Fragment() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvTimbreValue.text = progress.toString()
                 seekBar?.let {
+                    if (!isAdded) return@let
                     val insetPx = 15 * resources.displayMetrics.density
                     val available = it.width - it.paddingLeft - it.paddingRight - (2 * insetPx)
                     val thumbX = it.paddingLeft + insetPx + available * progress / it.max

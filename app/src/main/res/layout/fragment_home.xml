@@ -30,7 +30,8 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="@+id/tvCharacterTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage">
+    </com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character01"
@@ -85,7 +86,8 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toEndOf="@+id/character01_layout"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage">
+    </com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character02"
@@ -141,7 +143,8 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toEndOf="@+id/character02_layout"
         app:layout_constraintTop_toBottomOf="@+id/tvCharacterTitle"
-        app:shapeAppearanceOverlay="@style/CircleImage"></com.google.android.material.imageview.ShapeableImageView>
+        app:shapeAppearanceOverlay="@style/CircleImage">
+    </com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/character03"
@@ -282,7 +285,7 @@
         android:id="@+id/ivPitchArrow"
         android:layout_width="14dp"
         android:layout_height="14dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="10dp"
         android:src="@drawable/arrow_lightblue"
         app:layout_constraintBottom_toTopOf="@id/seekBarPitch"
         app:layout_constraintStart_toStartOf="@id/ivThumbAnchor"
@@ -346,7 +349,7 @@
         android:id="@+id/ivTimbreArrow"
         android:layout_width="14dp"
         android:layout_height="14dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="10dp"
         android:src="@drawable/arrow_blue"
         app:layout_constraintBottom_toTopOf="@id/seekBarTimbre"
         app:layout_constraintStart_toStartOf="@id/ivThumbAnchor"

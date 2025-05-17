@@ -13,102 +13,74 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.android.databinding.ActivityTtsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.imageview.ShapeableImageView
 
 class TtsActivity : AppCompatActivity() {
 
-    private lateinit var ivProfile: ShapeableImageView
-    private lateinit var etTitle: EditText
-    private lateinit var etScript: EditText
-    private lateinit var btnBack: ImageButton
-    private lateinit var btnMenu: ImageButton
-    private lateinit var btnClear: ImageButton
-    private lateinit var btnShare: ImageButton
-    private lateinit var btnPlay: ImageButton
-    private lateinit var btnPause: ImageButton
-    private lateinit var btnDownload: ImageButton
+    private lateinit var binding: ActivityTtsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tts)
+        binding = ActivityTtsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // 뷰 초기화
-        ivProfile = findViewById(R.id.iv_profile)
-        etTitle = findViewById(R.id.et_title)
-        etScript = findViewById(R.id.et_script)
-        btnBack = findViewById(R.id.ib_arrow_back)
-        btnMenu = findViewById(R.id.ib_menu)
-        btnClear = findViewById(R.id.btn_clear)
-        btnShare = findViewById(R.id.btn_share)
-        btnPlay = findViewById(R.id.btn_play)
-        btnPause = findViewById(R.id.btn_pause)
-        btnDownload = findViewById(R.id.btn_download)
+        setupViews()
+        setupListeners()
+        setupTextWatchers()
+        setProfileImage()
+    }
 
-        // 뒤로가기 버튼 → 액티비티 종료
-        btnBack.setOnClickListener {
-            finish()
+    private fun setupViews() = with(binding) {
+        btnPause.visibility = View.GONE
+    }
+
+    private fun setupListeners() = with(binding) {
+        ibArrowBack.setOnClickListener { finish() }
+        ibMenu.setOnClickListener {
+            startActivity(Intent(this@TtsActivity, TtsSaveActivity::class.java))
         }
+        btnClear.setOnClickListener { etScript.text.clear() }
+        btnDownload.setOnClickListener { showToast() }
+        btnShare.setOnClickListener { showShareBottomSheet() }
 
-        // 메뉴 버튼 클릭 → 추후 팝업 등 구현
-        btnMenu.setOnClickListener {
-
-        }
-
-        // 대사 초기화 버튼
-        btnClear.setOnClickListener {
-            etScript.text.clear()
-        }
-
-        // 공유 버튼 클릭
-        btnShare.setOnClickListener {
-            showShareBottomSheet()
-        }
-
-        // 재생 버튼 클릭
         btnPlay.setOnClickListener {
             btnPlay.visibility = View.GONE
             btnPause.visibility = View.VISIBLE
         }
-
         btnPause.setOnClickListener {
-            btnPlay.visibility = View.VISIBLE
             btnPause.visibility = View.GONE
+            btnPlay.visibility = View.VISIBLE
         }
-
-        val toastView = findViewById<TextView>(R.id.toast_down_tts)
-        // 다운로드 버튼 클릭
-        btnDownload.setOnClickListener {
-            toastView.visibility = View.VISIBLE
-
-            // 2초 뒤에 다시 GONE으로 변경
-            Handler(Looper.getMainLooper()).postDelayed({
-                toastView.visibility = View.GONE
-            }, 2000)
-        }
-
-        // 텍스트 입력에 따른 색상 변경
-        setupTextColorWatcher(etTitle)
-        setupTextColorWatcher(etScript)
-
-        val imageResId = intent.getIntExtra("image_res_id", R.drawable.tts_profile)
-        ivProfile.setImageResource(imageResId)
     }
 
-    private fun setupTextColorWatcher(editText: EditText) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val newColor = if (!s.isNullOrBlank()) {
-                    ContextCompat.getColor(this@TtsActivity, R.color.black01)
-                } else {
-                    ContextCompat.getColor(this@TtsActivity, R.color.Gray500)
+    private fun setupTextWatchers() = with(binding) {
+        listOf(etTitle, etScript).forEach { editText ->
+            editText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun afterTextChanged(s: Editable?) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    editText.setTextColor(
+                        ContextCompat.getColor(
+                            this@TtsActivity,
+                            if (!s.isNullOrBlank()) R.color.black01 else R.color.Gray500
+                        )
+                    )
                 }
-                editText.setTextColor(newColor)
-            }
-        })
+            })
+        }
+    }
+
+    private fun setProfileImage() {
+        val imageResId = intent.getIntExtra("image_res_id", R.drawable.tts_profile)
+        binding.ivProfile.setImageResource(imageResId)
+    }
+
+    private fun showToast() = with(binding.toastDownTts) {
+        visibility = View.VISIBLE
+        Handler(Looper.getMainLooper()).postDelayed({
+            visibility = View.GONE
+        }, 2000)
     }
 
     private fun showShareBottomSheet() {
@@ -116,27 +88,15 @@ class TtsActivity : AppCompatActivity() {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(view)
 
-        val tvFileName = view.findViewById<TextView>(R.id.tv_share_filename)
-        val rawTitle = etTitle.text.toString().trim()
+        val fileName = binding.etTitle.text.toString().trim().ifEmpty { "제목없음" }
+        view.findViewById<TextView>(R.id.tv_share_filename).text = "$fileName.mp3"
 
-        // 제목이 없으면 기본 이름 사용
-        val fileName = if (rawTitle.isNotEmpty()) rawTitle else "제목없음"
-        tvFileName.text = "$fileName.mp3"
-
-        // 버튼 이벤트들
-        view.findViewById<ImageView>(R.id.btn_share_kakao).setOnClickListener {
-            // 카카오 공유 처리
-            dialog.dismiss()
-        }
-
-        view.findViewById<ImageView>(R.id.btn_share_instagram).setOnClickListener {
-            // 인스타그램 공유 처리
-            dialog.dismiss()
-        }
-
-        view.findViewById<ImageView>(R.id.btn_share_x).setOnClickListener {
-            // X 공유 처리
-            dialog.dismiss()
+        listOf(
+            R.id.btn_share_kakao,
+            R.id.btn_share_instagram,
+            R.id.btn_share_x
+        ).forEach { id ->
+            view.findViewById<ImageView>(id).setOnClickListener { dialog.dismiss() }
         }
 
         dialog.show()

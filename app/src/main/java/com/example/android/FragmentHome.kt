@@ -56,10 +56,16 @@ class FragmentHome : Fragment() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvPitchValue.text = progress.toString()
                 seekBar?.let {
-                    val available = it.width - it.paddingLeft - it.paddingRight
-                    val thumbX = it.paddingLeft + available * progress / it.max
-                    binding.tvPitchValue.x = it.x + thumbX + 5f - binding.tvPitchValue.width / 2f
-                    binding.ivPitchArrow.x = it.x + thumbX + 5f - binding.ivPitchArrow.width / 2f
+                    if (!isAdded) return@let
+                    val insetPx = 15 * resources.displayMetrics.density
+                    val available = it.width - it.paddingLeft - it.paddingRight - (2 * insetPx)
+                    val thumbX = it.paddingLeft + insetPx + available * progress / it.max
+                    val thumbCenterX = it.x + thumbX
+
+                    // Anchor를 thumb 중심으로 이동
+                    binding.ivThumbAnchor.translationX = thumbCenterX - binding.ivThumbAnchor.width / 2f
+                    binding.tvPitchValue.x = thumbCenterX - binding.tvPitchValue.width / 2f
+                    binding.ivPitchArrow.x = thumbCenterX - binding.ivPitchArrow.width / 2f
                 }
             }
 
@@ -67,15 +73,21 @@ class FragmentHome : Fragment() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+
         // Timbre SeekBar
         binding.seekBarTimbre.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvTimbreValue.text = progress.toString()
                 seekBar?.let {
-                    val available = it.width - it.paddingLeft - it.paddingRight
-                    val thumbX = it.paddingLeft + available * progress / it.max
-                    binding.tvTimbreValue.x = it.x + thumbX + 5f - binding.tvTimbreValue.width / 2f
-                    binding.ivTimbreArrow.x = it.x + thumbX + 5f - binding.ivTimbreArrow.width / 2f
+                    if (!isAdded) return@let
+                    val insetPx = 15 * resources.displayMetrics.density
+                    val available = it.width - it.paddingLeft - it.paddingRight - (2 * insetPx)
+                    val thumbX = it.paddingLeft + insetPx + available * progress / it.max
+                    val thumbCenterX = it.x + thumbX
+
+                    binding.ivTimbreAnchor.translationX = thumbCenterX - binding.ivTimbreAnchor.width / 2f
+                    binding.tvTimbreValue.x = thumbCenterX - binding.tvTimbreValue.width / 2f
+                    binding.ivTimbreArrow.x = thumbCenterX - binding.ivTimbreArrow.width / 2f
                 }
             }
 
@@ -206,6 +218,7 @@ class FragmentHome : Fragment() {
         title.setTextColor(ContextCompat.getColor(requireContext(), R.color.Gray800))
         binding.btnDownload.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray400))
         binding.btnBluetooth.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray400))
-        binding.ivEQ.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray1000))
+        //binding.ivEQ.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.Gray1000))
+        binding.ivEQ.setImageResource(R.drawable.main_eq)
     }
 }

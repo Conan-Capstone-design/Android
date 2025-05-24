@@ -12,7 +12,8 @@ data class RecordlistModel(
     var isPlaying: Boolean = false
 )
 
-class RecordlistRVAdapter : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHolder>() {
+class RecordlistRVAdapter(
+    private val onDeleteClick: (position: Int) -> Unit) : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHolder>() {
 
     private val saveList = mutableListOf<RecordlistModel>()
 
@@ -20,6 +21,13 @@ class RecordlistRVAdapter : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHol
         saveList.clear()
         saveList.addAll(newChatList)
         notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        if (position in saveList.indices) {
+            saveList.removeAt(position)
+            notifyItemRemoved(position)
+        }
     }
 
     fun addItem(item: RecordlistModel) {
@@ -66,6 +74,10 @@ class RecordlistRVAdapter : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHol
             character01Layout.setOnClickListener {
                 item.isPlaying = !item.isPlaying
                 notifyItemChanged(adapterPosition)
+            }
+
+            imageView20.setOnClickListener {
+                onDeleteClick(adapterPosition)
             }
         }
     }

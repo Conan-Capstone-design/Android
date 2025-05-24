@@ -24,7 +24,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="62dp"
         android:background="@drawable/login_blue"
-        android:hint="아이디 입력"
+        android:hint="이메일 입력"
         android:textSize="16dp"
         android:fontFamily="@font/suit_regular"
         android:gravity="center|start"

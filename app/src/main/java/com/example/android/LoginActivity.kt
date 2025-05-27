@@ -25,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        MyApplication.initializeUser(this)
         user = MyApplication.getUser()
         editor = user.edit()
 

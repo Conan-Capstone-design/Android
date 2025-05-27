@@ -71,4 +71,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    fun switchToFragmentTTS() {
+        binding.AmainBnv.selectedItemId = R.id.bnv_tts
+    }
 }

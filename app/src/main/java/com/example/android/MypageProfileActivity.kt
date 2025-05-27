@@ -42,7 +42,7 @@ class MypageProfileActivity : AppCompatActivity() {
 
         val button2 = binding.button2
 
-        textPassword.setText(password)
+//        textPassword.setText(password)
 
         binding.textID.hint = nickName
         binding.textID2.text = email

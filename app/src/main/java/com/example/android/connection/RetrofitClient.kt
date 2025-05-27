@@ -107,7 +107,7 @@ class RetrofitClient {
         @SerializedName("message")
         val message: String,
         @SerializedName("result")
-        val result: ChatList
+        val result: List<ChatList>
     )
 
     data class ChatList(

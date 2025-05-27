@@ -22,7 +22,6 @@ class MypageProfileActivity : AppCompatActivity() {
     lateinit var binding: ActivityMypageProfileBinding
     private val PICK_IMAGE_REQUEST = 1 // 이미지를 선택하는 요청 코드
     var isPasswordVisible = false
-    private var password: String = ""
     private var email: String= ""
     private var nickName: String= ""
     private var selectedImageUri: Uri? = null
@@ -42,7 +41,7 @@ class MypageProfileActivity : AppCompatActivity() {
 
         val button2 = binding.button2
 
-//        textPassword.setText(password)
+        binding.textPassword.hint = "비밀번호 입력"
 
         binding.textID.hint = nickName
         binding.textID2.text = email

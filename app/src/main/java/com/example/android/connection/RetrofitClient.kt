@@ -54,4 +54,67 @@ class RetrofitClient {
         val created_at: String
     )
 
+    data class ResponseStartChat(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: ChatRoomResult
+    )
+
+    data class ChatRoomResult(
+        @SerializedName("chat_id")
+        val chatId: Int,
+        @SerializedName("is_new")
+        val isNew: Boolean,
+        @SerializedName("messages")
+        val messages: List<Message>,
+    )
+
+    data class Message(
+        @SerializedName("role")
+        val role: String,
+        @SerializedName("content")
+        val content: String
+    ) : java.io.Serializable
+
+    data class RequestMessage(
+        @SerializedName("chat_id")
+        val chatId: Int,
+        @SerializedName("message")
+        val message: String
+    )
+
+    data class ResponseMessage(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: Message
+    )
+
+    data class ResponseCharacterChat(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: ChatList
+    )
+
+    data class ChatList(
+        @SerializedName("character")
+        val character: String,
+        @SerializedName("updated_at")
+        val updated_at: String
+    )
+
 }

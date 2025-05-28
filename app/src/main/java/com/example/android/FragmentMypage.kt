@@ -39,7 +39,7 @@ class FragmentMypage: Fragment() {
         // 사용자 SharedPreferences 초기화
         user = MyApplication.getUser()
         token = user.getString("jwt", "").toString()
-
+        editor = user.edit()
 
         binding.imageViesecession.setOnClickListener {
             val intent = Intent(requireContext(), SecessionActivity::class.java)
@@ -101,6 +101,10 @@ class FragmentMypage: Fragment() {
                         if (email != null) {
                             binding.textView36.text = email
                         }
+
+                        editor.putString("nickname", userName)
+                        editor.putString("profileImg", imageUrl)
+                        editor.apply()
 
                         val characterData = it.commentList
                         // 식물 데이터가 없으면 'textViewnot'을 보이도록 처리

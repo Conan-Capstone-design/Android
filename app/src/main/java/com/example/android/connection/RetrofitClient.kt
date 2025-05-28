@@ -31,6 +31,29 @@ class RetrofitClient {
         val result: GetprofileResult
     )
 
+    data class ResponseProfile(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: Int,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: ResponseProfileResult
+    )
+
+    data class ResponseProfileResult(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: Int,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: Any // 또는 실제 결과가 어떤 형식인지에 따라 적절한 클래스 사용
+    )
+
+
     data class GetprofileResult(
         @SerializedName("user")
         val user: User,

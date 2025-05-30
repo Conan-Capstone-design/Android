@@ -10,8 +10,11 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.android.connection.RetrofitClient
+import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ActivityAgreefirstBinding
 import com.example.android.databinding.ActivityLoginBinding
 import com.example.android.databinding.ActivitySignupBinding
@@ -136,20 +139,45 @@ class SignupActivity : AppCompatActivity() {
                         binding.checkPassword.text.isNotBlank() &&
                         binding.writeNickname.text.isNotBlank()
 
-            val isAllValid =
-                idErrorVisible &&
-                        passwordMatchingVisible &&
-                        nicknameErrorVisible &&
-                        passwordConditionVisible &&
-                        isInputFilled
+            val isAllValid = idErrorVisible &&
+                    passwordMatchingVisible &&
+                    nicknameErrorVisible &&
+                    passwordConditionVisible &&
+                    isInputFilled
 
             if (isAllValid) {
                 val email = binding.writeEmail.text.toString()
                 val password = binding.writePassword.text.toString()
-                val nickName = binding.writeNickname.text.toString()
+                val nickname = binding.writeNickname.text.toString()
+                val option = 1
+                val image = "default.png"
 
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+                val request = RetrofitClient.RequestSignup(email, password, nickname, option, image)
+                val call = RetrofitObject.getRetrofitService.signup(request)
+
+                call.enqueue(object : retrofit2.Callback<RetrofitClient.ResponseSignup> {
+                    override fun onResponse(
+                        call: retrofit2.Call<RetrofitClient.ResponseSignup>,
+                        response: retrofit2.Response<RetrofitClient.ResponseSignup>
+                    ) {
+                        Log.d("RetrofitSignup", response.toString())
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            Log.d("RetrofitSignupBody", result.toString())
+                            if (result != null && result.isSuccess) {
+                                Toast.makeText(this@SignupActivity, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this@SignupActivity, LoginActivity::class.java))
+                            } else {
+                                Toast.makeText(this@SignupActivity, result?.message ?: "오류 발생", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: retrofit2.Call<RetrofitClient.ResponseSignup>, t: Throwable) {
+                        Log.e("SignupError", "통신 실패: ${t.message}")
+                        Toast.makeText(this@SignupActivity, "네트워크 오류 발생", Toast.LENGTH_SHORT).show()
+                    }
+                })
             }
         }
     }
@@ -199,4 +227,6 @@ class SignupActivity : AppCompatActivity() {
             binding.signupbtn.isEnabled = false
         }
     }
+
+
 }

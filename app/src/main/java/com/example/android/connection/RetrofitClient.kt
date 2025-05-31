@@ -124,4 +124,26 @@ class RetrofitClient {
         val updated_at: String
     )
 
+    data class ResponseMypageTTS(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: List<MypageTTSList>
+    )
+
+    data class MypageTTSList(
+        @SerializedName("voice_id")
+        val voiceId: String,
+        @SerializedName("dialogueText")
+        val dialogueText: String,
+        @SerializedName("createdAt")
+        val createdAt: String,
+        @SerializedName("voice")
+        val voice: String
+    )
+
 }

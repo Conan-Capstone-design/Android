@@ -29,4 +29,10 @@ interface RetrofitAPI {
     @GET("/chat/list")
     fun chatList(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseCharacterChat>
 
+    @GET("/mypage/voice-list/byChar")
+    fun mypageTTSList(
+        @Header("x-access-token") token: String,
+        @Query("characterName") characterName: String
+    ): Call<RetrofitClient.ResponseMypageTTS>
+
 }

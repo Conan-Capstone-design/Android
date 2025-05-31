@@ -1,84 +1,117 @@
 package com.example.android
 
 import android.content.Intent
+import android.media.MediaPlayer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.connection.RetrofitClient
 import com.example.android.databinding.ItemRecordlistBinding
 
-data class RecordlistModel(
-    val characterName: String,
-    val lastMessage: String,
-    var isPlaying: Boolean = false
-)
-
 class RecordlistRVAdapter(
-    private val onDeleteClick: (position: Int) -> Unit) : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHolder>() {
+    private val onDeleteClick: (position: Int) -> Unit
+) : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHolder>() {
 
-    private val saveList = mutableListOf<RecordlistModel>()
+    private val itemList = mutableListOf<RetrofitClient.MypageTTSList>()
 
-    fun updateChatList(newChatList: List<RecordlistModel>) {
-        saveList.clear()
-        saveList.addAll(newChatList)
+    fun updateChatList(newList: List<RetrofitClient.MypageTTSList>) {
+        itemList.clear()
+        itemList.addAll(newList)
         notifyDataSetChanged()
     }
 
     fun removeItem(position: Int) {
-        if (position in saveList.indices) {
-            saveList.removeAt(position)
+        if (position in itemList.indices) {
+            itemList.removeAt(position)
             notifyItemRemoved(position)
         }
     }
 
-    fun addItem(item: RecordlistModel) {
-        saveList.add(item)
-        notifyItemInserted(saveList.size - 1)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val binding = ItemRecordlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemRecordlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ChatViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        holder.bind(saveList[position])
+        holder.bind(itemList[position])
     }
 
-    override fun getItemCount(): Int = saveList.size
+    override fun getItemCount(): Int = itemList.size
 
     inner class ChatViewHolder(private val binding: ItemRecordlistBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: RecordlistModel) = with(binding) {
-            itemChattitleTv.text = item.characterName
-            itemDateTv.text = item.lastMessage
+        private var isPlaying = false
+        private var mediaPlayer: MediaPlayer? = null
 
+        fun bind(item: RetrofitClient.MypageTTSList) = with(binding) {
+            itemChattitleTv.text = item.dialogueText
+            itemDateTv.text = item.createdAt.substringBefore("T").replace("-", ".")
+
+            updateUI()
+
+            character01Layout.setOnClickListener {
+                if (isPlaying) {
+                    stopPlayback()
+                } else {
+                    startPlayback(item.voice)
+                }
+                isPlaying = !isPlaying
+                updateUI()
+            }
+
+            imageView20.setOnClickListener {
+                onDeleteClick(adapterPosition)
+            }
+        }
+
+        private fun startPlayback(url: String) {
+            mediaPlayer = MediaPlayer()
+            try {
+                mediaPlayer?.apply {
+                    setDataSource(url)
+                    setOnPreparedListener {
+                        start()
+                    }
+                    setOnCompletionListener {
+                        this@ChatViewHolder.isPlaying = false
+                        this@ChatViewHolder.updateUI()
+                        release()
+                        this@ChatViewHolder.mediaPlayer = null
+                    }
+                    prepareAsync()
+                }
+            } catch (e: Exception) {
+                Log.e("MediaPlayerError", "Failed to play audio: ${e.message}")
+            }
+        }
+
+        private fun stopPlayback() {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+        }
+
+        private fun updateUI() = with(binding) {
             character01Layout.setImageResource(
-                if (item.isPlaying) R.drawable.ic_pause_blue else R.drawable.ic_start
+                if (isPlaying) R.drawable.ic_pause_blue else R.drawable.ic_start
             )
             root.setBackgroundResource(
-                if (item.isPlaying) R.drawable.border_highlight_conan else R.drawable.border_highlight_gray
+                if (isPlaying) R.drawable.border_highlight_conan else R.drawable.border_highlight_gray
             )
             imageView20.setImageResource(
-                if (item.isPlaying) R.drawable.trash_blue else R.drawable.trash_gray
+                if (isPlaying) R.drawable.trash_blue else R.drawable.trash_gray
             )
 
-            val textColor = if (item.isPlaying) {
+            val textColor = if (isPlaying) {
                 root.context.getColor(R.color.conan03)
             } else {
                 root.context.getColor(R.color.Gray800)
             }
             itemChattitleTv.setTextColor(textColor)
             itemDateTv.setTextColor(textColor)
-
-            character01Layout.setOnClickListener {
-                item.isPlaying = !item.isPlaying
-                notifyItemChanged(adapterPosition)
-            }
-
-            imageView20.setOnClickListener {
-                onDeleteClick(adapterPosition)
-            }
         }
     }
 }

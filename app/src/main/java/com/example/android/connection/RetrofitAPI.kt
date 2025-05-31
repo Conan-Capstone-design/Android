@@ -2,6 +2,7 @@ package com.example.android.connection
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -34,5 +35,15 @@ interface RetrofitAPI {
         @Header("x-access-token") token: String,
         @Query("characterName") characterName: String
     ): Call<RetrofitClient.ResponseMypageTTS>
+
+    @DELETE("mypage/voice-list/byChar/delete")
+    fun mypageTTSDelete(
+        @Header("x-access-token") token: String,
+        @Query("characterName") characterName: String,
+        @Query("voiceId") voiceId: Int
+    ): Call<RetrofitClient.ResponseMypageTTSDelete>
+
+    @GET("mypage/voice-list")
+    fun MypageTTSlistGet(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseTTSListGet>
 
 }

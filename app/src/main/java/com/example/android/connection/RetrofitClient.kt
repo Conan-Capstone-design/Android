@@ -1,5 +1,6 @@
 package com.example.android.connection
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 class RetrofitClient {
@@ -144,6 +145,35 @@ class RetrofitClient {
         val createdAt: String,
         @SerializedName("voice")
         val voice: String
+    )
+
+    data class ResponseMypageTTSDelete(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: JsonObject?
+    )
+
+    data class ResponseTTSListGet(
+        @SerializedName("isSuccess")
+        val isSuccess: Boolean,
+        @SerializedName("code")
+        val code: String,
+        @SerializedName("message")
+        val message: String,
+        @SerializedName("result")
+        val result: List<TTSListGet>
+    )
+
+    data class TTSListGet(
+        @SerializedName("character")
+        val character: String,
+        @SerializedName("createdAt")
+        val createdAt: String
     )
 
 }

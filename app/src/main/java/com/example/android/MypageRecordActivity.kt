@@ -29,6 +29,7 @@ class MypageRecordActivity: AppCompatActivity() {
     private lateinit var user: SharedPreferences
     private lateinit var token: String
     private var clickedItemPosition = -1
+    private var clickedVoiceId = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMypagesaveCharacterBinding.inflate(layoutInflater)
@@ -37,7 +38,7 @@ class MypageRecordActivity: AppCompatActivity() {
         user = MyApplication.getUser()
         token = user.getString("jwt", "").toString()
 
-        val characterName = intent.getStringExtra("CHARACTER_NICKNAME")
+        val characterName = intent.getStringExtra("CHARACTER_NICKNAME")!!
         binding.listTitleTv.text = characterName // 예시로 TextView에 표시
 
         binding.listBackBtn.setOnClickListener {
@@ -48,7 +49,8 @@ class MypageRecordActivity: AppCompatActivity() {
 
         //리사이클러뷰 어댑터
         // 어댑터 초기화 시 콜백 전달
-        chatListAdapter = RecordlistRVAdapter { position ->
+        chatListAdapter = RecordlistRVAdapter { voiceId, position ->
+            clickedVoiceId = voiceId
             clickedItemPosition = position
             showCustomDialog()
         }
@@ -117,19 +119,39 @@ class MypageRecordActivity: AppCompatActivity() {
             alertDialog.dismiss() // 다이얼로그 닫기
             // 추가적인 작업 수행 가능
         }
-
+        val characterName = intent.getStringExtra("CHARACTER_NICKNAME")!!
         // 확인 버튼 클릭 리스너 설정
         confirmButton.setOnClickListener {
-            if (clickedItemPosition != -1) {
-                // 아이템 삭제 로직
-                // 예시: chatListAdapter에서 해당 아이템 삭제
-                chatListAdapter.removeItem(clickedItemPosition)
-                Log.d("MyApp", "삭제한 위치: $clickedItemPosition")
-                clickedItemPosition = -1
+            if (clickedItemPosition != -1 && clickedVoiceId != -1) {
+                RetrofitObject.getRetrofitService
+                    .mypageTTSDelete(token, characterName, clickedVoiceId)
+                    .enqueue(object : Callback<RetrofitClient.ResponseMypageTTSDelete> {
+                        override fun onResponse(
+                            call: Call<RetrofitClient.ResponseMypageTTSDelete>,
+                            response: Response<RetrofitClient.ResponseMypageTTSDelete>
+                        ) {
+                            if (response.isSuccessful && response.body()?.isSuccess == true) {
+                                chatListAdapter.removeItem(clickedItemPosition)
+                                Toast.makeText(this@MypageRecordActivity, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@MypageRecordActivity, "삭제 실패", Toast.LENGTH_SHORT).show()
+                            }
+                            resetDeleteState()
+                        }
+
+                        override fun onFailure(call: Call<RetrofitClient.ResponseMypageTTSDelete>, t: Throwable) {
+                            Toast.makeText(this@MypageRecordActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                            resetDeleteState()
+                        }
+                    })
             }
             alertDialog.dismiss()
         }
         alertDialog.show()
     }
 
+    private fun resetDeleteState() {
+        clickedItemPosition = -1
+        clickedVoiceId = -1
+    }
 }

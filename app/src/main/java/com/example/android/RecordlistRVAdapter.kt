@@ -7,10 +7,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.connection.RetrofitClient
+import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ItemRecordlistBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RecordlistRVAdapter(
-    private val onDeleteClick: (position: Int) -> Unit
+    private val onDeleteClick: (voiceId: Int, position: Int) -> Unit
 ) : RecyclerView.Adapter<RecordlistRVAdapter.ChatViewHolder>() {
 
     private val itemList = mutableListOf<RetrofitClient.MypageTTSList>()
@@ -63,8 +67,12 @@ class RecordlistRVAdapter(
             }
 
             imageView20.setOnClickListener {
-                onDeleteClick(adapterPosition)
+                val voiceId = item.voiceId.toIntOrNull()
+                if (voiceId != null) {
+                    onDeleteClick(voiceId, adapterPosition)
+                }
             }
+
         }
 
         private fun startPlayback(url: String) {

@@ -81,6 +81,13 @@ class RetrofitClient {
         val content: String
     ) : java.io.Serializable
 
+    data class Message2(
+        @SerializedName("role")
+        val role: String,
+        @SerializedName("message")
+        val message: String
+    ) : java.io.Serializable
+
     data class RequestMessage(
         @SerializedName("chat_id")
         val chatId: Int,
@@ -96,7 +103,7 @@ class RetrofitClient {
         @SerializedName("message")
         val message: String,
         @SerializedName("result")
-        val result: Message
+        val result: Message2
     )
 
     data class ResponseCharacterChat(

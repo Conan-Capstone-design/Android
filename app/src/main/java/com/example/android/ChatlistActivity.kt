@@ -55,6 +55,7 @@ class ChatlistActivity: AppCompatActivity() {
                 response: Response<RetrofitClient.ResponseCharacterChat>
             ) {
                 if (response.isSuccessful) {
+                    Log.d("ChatlistActivity", "response: $response")
                     val chatListResponse = response.body()
                     if (chatListResponse != null && chatListResponse.isSuccess) {
                         chatListAdapter.updateChatList(chatListResponse.result)

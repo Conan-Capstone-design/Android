@@ -69,7 +69,7 @@ class CharacterChatActivity : AppCompatActivity() {
         //전송
         binding.btnChatSend.setOnClickListener {
             val message = binding.chatInputEt.text.toString()
-            val chatId = intent.getIntExtra("chat_id", -1)
+            val chatId = intent.getIntExtra("chatId", -1)
 
             if (message.isNotBlank()) {
                 messageAdapter.apply {
@@ -78,7 +78,7 @@ class CharacterChatActivity : AppCompatActivity() {
                 // 메시지 전송 후 입력 필드 초기화
                 binding.chatInputEt.text.clear()
 
-                val chatId = intent.getIntExtra("chat_id", -1)
+                val chatId = intent.getIntExtra("chatId", -1)
 
                 if (token != null) {
                     sendMessageToAPI(token, chatId, message, messageAdapter)
@@ -101,7 +101,7 @@ class CharacterChatActivity : AppCompatActivity() {
                     val body = response.body()
                     if (body != null && body.isSuccess) {
                         // assistant 응답 메시지 받아서 추가
-                        val reply = body.result.content
+                        val reply = body.result.message
                         Log.d("nowChat", "reply: $reply")
                         messageAdapter.addItem(MessageModel.ReceiverMessage(reply))
                         binding.chatRv.scrollToPosition(messageAdapter.itemCount - 1)

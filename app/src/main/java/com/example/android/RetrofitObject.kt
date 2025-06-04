@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitObject {
 
-    private const val BASE_URL = "http://conan.ap-northeast-2.elasticbeanstalk.com"
+    private const val BASE_URL = "http://Conan-fin-env.eba-jffuiuqx.ap-northeast-2.elasticbeanstalk.com"
 
     private val getRetrofit by lazy {
 

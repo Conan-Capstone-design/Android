@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 class RetrofitClient {
     data class Requestlogin(
         @SerializedName("email")
-        val member_id: String,
+        val email: String,
         @SerializedName("password")
         val password: String
     )

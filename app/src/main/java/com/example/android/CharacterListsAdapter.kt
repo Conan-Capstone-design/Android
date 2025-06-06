@@ -8,8 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.connection.RetrofitClient
-import com.example.android.databinding.ItemSavelistBinding
-class SavelistRVAdapter(private val itemList: List<RetrofitClient.TTSListGet>) : RecyclerView.Adapter<SavelistRVAdapter.ViewHolder>() {
+
+class CharacterListsAdapter(private val itemList: List<RetrofitClient.commentList>) : RecyclerView.Adapter<CharacterListsAdapter.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_savelist, parent, false)
         return ViewHolder(view)
@@ -28,10 +29,10 @@ class SavelistRVAdapter(private val itemList: List<RetrofitClient.TTSListGet>) :
         private val textView: TextView = itemView.findViewById(R.id.item_chattitle_tv)
         private val textView2: TextView = itemView.findViewById(R.id.item_date_tv)
         private val imageView: ImageView = itemView.findViewById(R.id.character01)
-        fun bind(item: RetrofitClient.TTSListGet) {
+        fun bind(item: RetrofitClient.commentList) {
             textView.text = item.character
             // 날짜 포맷 변경 (선택사항)
-            val date = item.createdAt.substringBefore("T").replace("-", ".")
+            val date = item.created_at.substringBefore("T").replace("-", ".")
             textView2.text = date
 
             // 캐릭터 이름에 따라 이미지 설정

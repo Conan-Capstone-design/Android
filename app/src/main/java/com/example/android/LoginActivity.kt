@@ -39,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.Passwordtext.text.toString()
 
             val call = RetrofitObject.getRetrofitService.login(RetrofitClient.Requestlogin(email, password))
+            Log.d("Retrofit21", call.request().toString())
             call.enqueue(object : Callback<RetrofitClient.Responselogin> {
                 override fun onResponse(call: Call<RetrofitClient.Responselogin>, response: Response<RetrofitClient.Responselogin>) {
                     Log.d("Retrofit21", response.toString())

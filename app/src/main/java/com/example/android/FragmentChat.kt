@@ -1,7 +1,9 @@
 package com.example.android
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +11,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.android.connection.RetrofitClient
+import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.FragmentChatBinding
 import com.example.android.databinding.FragmentHomeBinding
 import com.example.android.databinding.FragmentTtsBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FragmentChat: Fragment() {
     private lateinit var binding: FragmentChatBinding
+    private lateinit var user: SharedPreferences
+    private lateinit var token: String
 
     // 선택된 캐릭터 인덱스: 0 = 없음, 1~3은 캐릭터 번호
     private var selectedCharacterIndex = 0
@@ -25,7 +34,9 @@ class FragmentChat: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
-
+        // 사용자 SharedPreferences 초기화
+        user = MyApplication.getUser()
+        token = user.getString("jwt", "").toString()
         binding.character01Layout.setOnClickListener {
             updateSelection(1,
                 binding.character01Layout,
@@ -56,10 +67,12 @@ class FragmentChat: Fragment() {
                 return@setOnClickListener
             }
 
-            val characterName = binding.character.text.toString()
-            val intent = Intent(requireContext(), CharacterChatActivity::class.java)
-            intent.putExtra("character_name", characterName)
-            startActivity(intent)
+//            val characterName = binding.character.text.toString()
+//            val intent = Intent(requireContext(), CharacterChatActivity::class.java)
+//            intent.putExtra("character_name", characterName)
+//            startActivity(intent)
+
+            startChatRoom()
         }
         return binding.root
     }
@@ -123,5 +136,35 @@ class FragmentChat: Fragment() {
         background.visibility = View.VISIBLE
         title.setBackgroundResource(R.drawable.roundtab__character_title)
         title.setTextColor(ContextCompat.getColor(requireContext(), R.color.Gray800))
+    }
+
+    private fun startChatRoom() {
+        val characterName = binding.character.text.toString()  // 선택된 캐릭터 이름
+        val call = RetrofitObject.getRetrofitService.startChat(token, characterName)
+        call.enqueue(object : Callback<RetrofitClient.ResponseStartChat> {
+            override fun onResponse(call: Call<RetrofitClient.ResponseStartChat>, response: Response<RetrofitClient.ResponseStartChat>) {
+                if (response.isSuccessful) {
+                    val startChatResponse = response.body()
+                    Log.d("StartChat", "chatresponse: $startChatResponse")
+                    if (startChatResponse != null && startChatResponse.isSuccess) {
+                        val messages = startChatResponse.result.messages
+                        val chatId = startChatResponse.result.chatId
+                        val intent = Intent(activity, CharacterChatActivity::class.java)
+                        intent.putExtra("messages", ArrayList(messages)) // messages만 넘김
+                        intent.putExtra("character_name", characterName)  // 캐릭터 이름 전달
+                        intent.putExtra("chatId", chatId)
+                        startActivity(intent)
+                    } else {
+                        Log.e("StartChat", "Failed to create chat room")
+                    }
+                } else {
+                    Log.e("StartChat", "Response error: ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<RetrofitClient.ResponseStartChat>, t: Throwable) {
+                Log.e("StartChat", "API call failed: ${t.message}")
+            }
+        })
     }
 }

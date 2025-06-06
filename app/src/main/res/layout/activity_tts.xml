@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -53,9 +54,9 @@
         android:id="@+id/iv_bg_wave"
         android:layout_width="match_parent"
         android:layout_height="449dp"
+        android:layout_marginTop="85dp"
         android:background="@drawable/bg_wave"
-        android:layout_marginTop="167dp"
-        app:layout_constraintTop_toBottomOf="@+id/Tts_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_circle" />
 
     <ImageView
         android:id="@+id/profile_circle"
@@ -146,21 +147,21 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="28dp"
-        android:layout_marginBottom="32dp"
         android:background="@drawable/tts_share"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_bg_wave" />
 
     <!-- 재생 버튼 -->
     <ImageButton
         android:id="@+id/btn_play"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="18dp"
         android:background="@drawable/tts_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_download"
-        app:layout_constraintStart_toEndOf="@+id/btn_share"/>
+        app:layout_constraintStart_toEndOf="@+id/btn_share"
+        app:layout_constraintTop_toBottomOf="@+id/iv_bg_wave" />
 
     <!--정지 버튼-->
     <ImageButton
@@ -180,10 +181,10 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="28dp"
-        android:layout_marginBottom="32dp"
         android:background="@drawable/tts_down"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="@+id/btn_play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_play" />
 
     <TextView
         android:id="@+id/toast_down_tts"

@@ -46,4 +46,10 @@ interface RetrofitAPI {
     @GET("mypage/voice-list")
     fun MypageTTSlistGet(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseTTSListGet>
 
+    @POST("/user/sign-up")
+    fun signup(@Body request: RetrofitClient.RequestSignup): Call<RetrofitClient.ResponseSignup>
+
+    @POST("/user/withdraw")
+    fun withdrawUser(@retrofit2.http.Header("x-access-token") token: String): Call<RetrofitClient.ResponseWithdraw>
+
 }

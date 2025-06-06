@@ -38,11 +38,49 @@ class SecessionActivity: AppCompatActivity() {
             }
         }
         binding.button3.setOnClickListener {
-            val intent =
-                Intent(this@SecessionActivity, LoginActivity::class.java)
-            val stackBuilder = TaskStackBuilder.create(this@SecessionActivity)
-            stackBuilder.addNextIntentWithParentStack(intent)
-            stackBuilder.startActivities()
+            if (!isChecked) {
+                Toast.makeText(this, "동의 후 탈퇴가 가능합니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val token = MyApplication.getUser().getString("jwt", null)
+
+            if (token != null) {
+                val call = com.example.android.connection.RetrofitObject.getRetrofitService.withdrawUser(token)
+                call.enqueue(object : retrofit2.Callback<com.example.android.connection.RetrofitClient.ResponseWithdraw> {
+                    override fun onResponse(
+                        call: retrofit2.Call<com.example.android.connection.RetrofitClient.ResponseWithdraw>,
+                        response: retrofit2.Response<com.example.android.connection.RetrofitClient.ResponseWithdraw>
+                    ) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null && result.isSuccess) {
+                                Toast.makeText(this@SecessionActivity, result.result.message, Toast.LENGTH_SHORT).show()
+                                // SharedPreferences 초기화
+                                MyApplication.getUser().edit().clear().apply()
+                                // 로그인 화면으로 이동
+                                val intent = Intent(this@SecessionActivity, LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                            } else {
+                                Toast.makeText(this@SecessionActivity, result?.message ?: "탈퇴 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(this@SecessionActivity, "서버 오류: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: retrofit2.Call<com.example.android.connection.RetrofitClient.ResponseWithdraw>,
+                        t: Throwable
+                    ) {
+                        Toast.makeText(this@SecessionActivity, "통신 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                        Log.e("Secession", "API Failure", t)
+                    }
+                })
+            } else {
+                Toast.makeText(this, "로그인 토큰이 없습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

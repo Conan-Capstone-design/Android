@@ -72,7 +72,8 @@ class MypageProfileActivity : AppCompatActivity() {
 
         binding.textPassword.hint = "비밀번호 입력"
 
-        binding.textID.hint = nickName
+        // binding.textID.hint = nickName
+        binding.textID.setText(nickName)  // 실제 텍스트로 표시
         binding.textID2.text = email
 
         binding.imageView10.setOnClickListener {
@@ -143,7 +144,8 @@ class MypageProfileActivity : AppCompatActivity() {
 
         binding.button2.setOnClickListener {
 
-            val nickNamePart = nickName.toRequestBody("text/plain".toMediaTypeOrNull())
+            val currentNickName = binding.textID.text.toString() //
+            val nickNamePart = currentNickName.toRequestBody("text/plain".toMediaTypeOrNull())
             val password = binding.textPassword.text.toString()
             val passwordPart = password.toRequestBody("text/plain".toMediaTypeOrNull())
 
@@ -161,6 +163,9 @@ class MypageProfileActivity : AppCompatActivity() {
                             val responseBody = response.body()
                             Log.d("Retrofit40", responseBody.toString())
                             if (responseBody != null && responseBody.isSuccess) {
+                                editor = user.edit()
+                                editor.putString("nickName", currentNickName)
+                                editor.apply()
                                 finish()
                             } else {
                                 Toast.makeText(
@@ -207,6 +212,12 @@ class MypageProfileActivity : AppCompatActivity() {
                             val responseBody = response.body()
                             Log.d("Retrofit4", responseBody.toString())
                             if (responseBody != null && responseBody.isSuccess) {
+                                val updatedNickName = binding.textID.text.toString()  // 사용자가 입력한 닉네임
+
+                                editor = user.edit()
+                                editor.putString("nickName", currentNickName)
+                                editor.apply()
+
                                 finish()
                             } else {
                                 Toast.makeText(

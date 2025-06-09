@@ -1,9 +1,11 @@
 package com.example.android
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -11,14 +13,22 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.android.connection.RetrofitClient
+import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ActivityTtsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TtsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTtsBinding
+    private var savedVoiceUrl: String = ""
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,16 +51,107 @@ class TtsActivity : AppCompatActivity() {
             startActivity(Intent(this@TtsActivity, TtsSaveActivity::class.java))
         }
         btnClear.setOnClickListener { etScript.text.clear() }
-        btnDownload.setOnClickListener { showToast() }
         btnShare.setOnClickListener { showShareBottomSheet() }
 
         btnPlay.setOnClickListener {
             btnPlay.visibility = View.GONE
             btnPause.visibility = View.VISIBLE
+
+            // 이미 mediaPlayer가 있고 일시정지된 경우 → 이어서 재생
+            if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+                mediaPlayer?.start()
+                return@setOnClickListener
+            }
+
+            val token = MyApplication.getUser().getString("jwt", null)
+            val characterId = intent.getIntExtra("character_id", 0)
+            val dialogueText = binding.etScript.text.toString()
+
+            if (token.isNullOrBlank() || characterId == 0 || dialogueText.isBlank()) {
+                Toast.makeText(this@TtsActivity, "로그인 또는 대사를 확인해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val call = RetrofitObject.getRetrofitService.playVoice(token, characterId)
+            call.enqueue(object : Callback<RetrofitClient.ResponseVoicePlay> {
+                override fun onResponse(
+                    call: Call<RetrofitClient.ResponseVoicePlay>,
+                    response: Response<RetrofitClient.ResponseVoicePlay>
+                ) {
+                    if (response.isSuccessful && response.body()?.isSuccess == true) {
+                        val voiceUrl = response.body()?.result?.voiceUrl
+
+                        // 재생 중이던 게 있다면 release 먼저
+                        mediaPlayer?.release()
+
+                        // MediaPlayer로 S3 URL 재생
+                        mediaPlayer = MediaPlayer().apply {
+                            setDataSource(voiceUrl)
+                            setOnPreparedListener { start() } // 준비되면 자동 시작
+                            setOnCompletionListener {
+                                btnPause.visibility = View.GONE
+                                btnPlay.visibility = View.VISIBLE
+                            }
+                            prepareAsync()
+                        }
+
+                        // 재생이 완료된 S3 링크를 변수로 저장
+                        savedVoiceUrl = voiceUrl ?: ""
+                    } else {
+                        Toast.makeText(this@TtsActivity, "음성 생성 실패", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<RetrofitClient.ResponseVoicePlay>, t: Throwable) {
+                    Toast.makeText(this@TtsActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
+
         btnPause.setOnClickListener {
             btnPause.visibility = View.GONE
             btnPlay.visibility = View.VISIBLE
+
+            mediaPlayer?.let {
+                if (it.isPlaying) {
+                    it.pause() // 일시정지
+                }
+            }
+        }
+
+        btnDownload.setOnClickListener {
+            val token = MyApplication.getUser().getString("jwt", null)
+            val characterId = intent.getIntExtra("character_id", 0)
+            val dialogueText = binding.etScript.text.toString()
+
+            if (token.isNullOrBlank() || characterId == 0 || dialogueText.isBlank() || savedVoiceUrl.isBlank()) {
+                Toast.makeText(this@TtsActivity, "음성 생성 후 저장할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val request = RetrofitClient.RequestVoiceSave(
+                characterId = characterId.toString(),
+                voiceUrl = savedVoiceUrl,
+                dialogueText = dialogueText
+            )
+
+            val call = RetrofitObject.getRetrofitService.voiceSave(token, request)
+            call.enqueue(object : Callback<RetrofitClient.ResponseVoiceSave> {
+                override fun onResponse(
+                    call: Call<RetrofitClient.ResponseVoiceSave>,
+                    response: Response<RetrofitClient.ResponseVoiceSave>
+                ) {
+                    if (response.isSuccessful && response.body()?.isSuccess == true) {
+                        showToast()
+                    } else {
+                        Toast.makeText(this@TtsActivity, "저장 실패", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<RetrofitClient.ResponseVoiceSave>, t: Throwable) {
+                    Toast.makeText(this@TtsActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 
@@ -100,5 +201,11 @@ class TtsActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }

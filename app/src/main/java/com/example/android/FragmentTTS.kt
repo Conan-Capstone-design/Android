@@ -58,6 +58,7 @@ class FragmentTTS: Fragment() {
             val characterName = binding.character.text.toString()
             val intent = Intent(requireContext(), TtsActivity::class.java)
             intent.putExtra("character_name", characterName)
+            intent.putExtra("character_id", selectedCharacterIndex) // 1, 2, 3
             intent.putExtra("image_res_id", selectedImageResId)
             startActivity(intent)
         }

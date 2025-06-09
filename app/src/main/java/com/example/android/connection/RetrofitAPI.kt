@@ -11,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RetrofitAPI {
@@ -62,6 +63,24 @@ interface RetrofitAPI {
     fun signup(@Body request: RetrofitClient.RequestSignup): Call<RetrofitClient.ResponseSignup>
 
     @POST("/user/withdraw")
-    fun withdrawUser(@retrofit2.http.Header("x-access-token") token: String): Call<RetrofitClient.ResponseWithdraw>
+    fun withdrawUser(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseWithdraw>
+
+    @GET("/tts/voice-play/{voice_id}")
+    fun playVoice(
+        @Header("x-access-token") token: String,
+        @Path("voice_id") voiceId: Int): Call<RetrofitClient.ResponseVoicePlay>
+
+    @POST("/tts/voice-save")
+    fun voiceSave(
+        @Header("x-access-token") token: String,
+        @Body request: RetrofitClient.RequestVoiceSave): Call<RetrofitClient.ResponseVoiceSave>
+
+    @DELETE("/tts/voice-delete/{voice_id}")
+    fun deleteVoice(
+        @Header("x-access-token") token: String,
+        @Path("voice_id") voiceId: Int): Call<RetrofitClient.ResponseVoiceDelete>
+
+    @GET("/tts/voice-all")
+    fun getAllVoices(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseVoiceAll>
 
 }

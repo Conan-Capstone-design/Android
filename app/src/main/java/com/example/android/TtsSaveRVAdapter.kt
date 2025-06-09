@@ -7,6 +7,7 @@ import com.example.android.databinding.ItemRecordlistBinding
 
 // 데이터 모델
 data class TtsSaveModel(
+    val voiceId: Int, // 추가
     val characterName: String,
     val lastMessage: String,
     var isPlaying: Boolean = false
@@ -14,7 +15,8 @@ data class TtsSaveModel(
 
 class TtsSaveRVAdapter(
     private val saveList: MutableList<TtsSaveModel>,
-    private val onDeleteClick: (Int) -> Unit
+    private val onDeleteClick: (Int) -> Unit,
+    private val onPlayClick: (Int) -> Unit  // 추가
 ) : RecyclerView.Adapter<TtsSaveRVAdapter.ChatViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
@@ -54,8 +56,7 @@ class TtsSaveRVAdapter(
             itemDateTv.setTextColor(textColor)
 
             character01Layout.setOnClickListener {
-                item.isPlaying = !item.isPlaying
-                notifyItemChanged(adapterPosition)
+                onPlayClick(adapterPosition)
             }
 
             imageView20.setOnClickListener {

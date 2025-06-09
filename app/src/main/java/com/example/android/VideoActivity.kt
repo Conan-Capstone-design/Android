@@ -14,7 +14,19 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.commit
+import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ActivityVideoBinding
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 
 class VideoActivity : AppCompatActivity() {
     lateinit var binding: ActivityVideoBinding
@@ -109,49 +121,96 @@ class VideoActivity : AppCompatActivity() {
         }
 
         binding.btnConvert.setOnClickListener {
-            binding.btnSave.isEnabled = true
-            selectedVideoUri?.let { uri ->
-                if (!isConverted) {
-                    isConverted = true
-                    convertedVideoUri = uri
+            val token = MyApplication.getUser().getString("jwt", null)
+            val uri = selectedVideoUri
 
-                    // videoView2에 영상 표시
-                    binding.videoView2.apply {
-                        visibility = View.VISIBLE
-                        setVideoURI(convertedVideoUri)
-                        seekTo(1)
-                    }
+            if (token.isNullOrBlank() || uri == null) {
+                Toast.makeText(this, "먼저 영상을 업로드하세요", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                    binding.btnPlayVideo2.visibility = View.VISIBLE
-                    binding.btnPauseVideo2.visibility = View.GONE
+            val inputStream = contentResolver.openInputStream(uri)
+            val file = File(cacheDir, "upload_video_${System.currentTimeMillis()}.mp4")
+            inputStream?.use { input ->
+                FileOutputStream(file).use { output -> input.copyTo(output) }
+            }
 
-                    // btnSave 위치 아래로
-                    binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        topMargin = 164.dpToPx()
-                    }
+            val videoPart = MultipartBody.Part.createFormData(
+                "video",
+                file.name,
+                file.asRequestBody("video/mp4".toMediaTypeOrNull())
+            )
+            val targetIndex = "1".toRequestBody("text/plain".toMediaTypeOrNull())
 
-                    // 변환영상
-                    binding.videoView2.setOnCompletionListener {
-                        binding.btnPauseVideo2.visibility = View.GONE
+            val call = RetrofitObject.getRetrofitService.convertVideo(token, videoPart, targetIndex)
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        // 서버로부터 받은 mp4 파일 저장
+                        val convertedFile = File(cacheDir, "converted_${System.currentTimeMillis()}.mp4")
+                        response.body()?.byteStream()?.use { input ->
+                            FileOutputStream(convertedFile).use { output -> input.copyTo(output) }
+                        }
+
+                        convertedVideoUri = Uri.fromFile(convertedFile)
+
+                        // videoView2에 영상 표시
+                        binding.videoView2.apply {
+                            visibility = View.VISIBLE
+                            setVideoURI(convertedVideoUri)
+                            seekTo(1)
+                        }
+
+                        // 비디오 변환 성공한 후 저장 버튼 활성화
+                        binding.btnSave.isEnabled = true
+                        isConverted = true
+
                         binding.btnPlayVideo2.visibility = View.VISIBLE
-                        binding.videoView2.seekTo(1)
-                    }
-
-                    // 변환영상 재생 버튼
-                    binding.btnPlayVideo2.setOnClickListener {
-                        binding.videoView2.start()
-                        binding.btnPlayVideo2.visibility = View.GONE
-                        binding.btnPauseVideo2.visibility = View.VISIBLE
-                    }
-
-                    // 변환영상 일시정지 버튼
-                    binding.btnPauseVideo2.setOnClickListener {
-                        binding.videoView2.pause()
                         binding.btnPauseVideo2.visibility = View.GONE
-                        binding.btnPlayVideo2.visibility = View.VISIBLE
+
+                        // btnSave 위치 아래로
+                        binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            topMargin = 164.dpToPx()
+                        }
+
+                        // 변환영상
+                        binding.videoView2.setOnCompletionListener {
+                            binding.btnPauseVideo2.visibility = View.GONE
+                            binding.btnPlayVideo2.visibility = View.VISIBLE
+                            binding.videoView2.seekTo(1)
+                        }
+
+                        // 변환영상 재생 버튼
+                        binding.btnPlayVideo2.setOnClickListener {
+                            binding.videoView2.start()
+                            binding.btnPlayVideo2.visibility = View.GONE
+                            binding.btnPauseVideo2.visibility = View.VISIBLE
+                        }
+
+                        // 변환영상 일시정지 버튼
+                        binding.btnPauseVideo2.setOnClickListener {
+                            binding.videoView2.pause()
+                            binding.btnPauseVideo2.visibility = View.GONE
+                            binding.btnPlayVideo2.visibility = View.VISIBLE
+                        }
+
+                    } else {
+                        // 실패 시 에러 메시지 파싱
+                        val errorMsg = try {
+                            val errorJson = JSONObject(response.errorBody()?.string() ?: "")
+                            errorJson.optJSONObject("result")?.optString("error")
+                                ?: errorJson.optString("message", "비디오 변환 실패")
+                        } catch (e: Exception) {
+                            "비디오 변환 실패"
+                        }
+                        Toast.makeText(this@VideoActivity, errorMsg, Toast.LENGTH_SHORT).show()
                     }
                 }
-            } ?: Toast.makeText(this, "먼저 영상을 업로드하세요", Toast.LENGTH_SHORT).show()
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Toast.makeText(this@VideoActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 

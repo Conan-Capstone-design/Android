@@ -2,6 +2,7 @@ package com.example.android.connection
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -13,6 +14,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
 
 interface RetrofitAPI {
     @POST("/user/login")
@@ -82,5 +84,13 @@ interface RetrofitAPI {
 
     @GET("/tts/voice-all")
     fun getAllVoices(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseVoiceAll>
+
+    @Multipart
+    @POST("/llvc/video-convert")
+    @Streaming
+    fun convertVideo(
+        @Header("x-access-token") token: String,
+        @Part video: MultipartBody.Part,
+        @Part("targetIndex") targetIndex: RequestBody): Call<ResponseBody>
 
 }

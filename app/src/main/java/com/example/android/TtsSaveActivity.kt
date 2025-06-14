@@ -3,6 +3,7 @@ package com.example.android
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -60,28 +61,47 @@ class TtsSaveActivity : AppCompatActivity() {
                 mediaPlayer = null
 
                 // 음성 재생 요청
-                val call = RetrofitObject.getRetrofitService.playVoice(token, item.voiceId)
+                val request = RetrofitClient.RequestVoicePlay(
+                    character = item.characterName,
+                    text = item.dialogueText
+                )
+                val call = RetrofitObject.getRetrofitService.playVoice(token, request)
+
                 call.enqueue(object : Callback<RetrofitClient.ResponseVoicePlay> {
                     override fun onResponse(
                         call: Call<RetrofitClient.ResponseVoicePlay>,
                         response: Response<RetrofitClient.ResponseVoicePlay>
                     ) {
                         if (response.isSuccessful && response.body()?.isSuccess == true) {
-                            val url = response.body()?.result?.voiceUrl ?: return
-                            mediaPlayer = MediaPlayer().apply {
-                                setDataSource(url)
-                                setOnPreparedListener {
-                                    start()
-                                    item.isPlaying = true
-                                    adapter.notifyItemChanged(position)
-                                    currentlyPlayingIndex = position
+                            val url = response.body()?.result?.voiceUrl
+                            Log.d("TTS_DEBUG", "재생할 voiceUrl: $url")
+
+                            try {
+                                if (url.isNullOrBlank() || url.contains("undefined")) {
+                                    Toast.makeText(this@TtsSaveActivity, "재생할 파일이 없습니다.", Toast.LENGTH_SHORT).show()
+                                    return
                                 }
-                                setOnCompletionListener {
-                                    item.isPlaying = false
-                                    adapter.notifyItemChanged(position)
-                                    currentlyPlayingIndex = null
+
+                                mediaPlayer = MediaPlayer().apply {
+                                    setDataSource(url)
+                                    setOnPreparedListener {
+                                        start()
+                                        item.isPlaying = true
+                                        adapter.notifyItemChanged(position)
+                                        currentlyPlayingIndex = position
+                                    }
+                                    setOnCompletionListener {
+                                        item.isPlaying = false
+                                        adapter.notifyItemChanged(position)
+                                        currentlyPlayingIndex = null
+                                    }
+                                    prepareAsync()
                                 }
-                                prepareAsync()
+                            } catch (e: Exception) {
+                                Log.e("TTS_DEBUG", "MediaPlayer 오류: ${e.message}", e)
+                                Toast.makeText(this@TtsSaveActivity, "음성 재생 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                                item.isPlaying = false
+                                adapter.notifyItemChanged(position)
                             }
                         } else {
                             Toast.makeText(this@TtsSaveActivity, "재생 실패", Toast.LENGTH_SHORT).show()
@@ -128,10 +148,14 @@ class TtsSaveActivity : AppCompatActivity() {
                             TtsSaveModel(
                                 voiceId = it.voiceId,
                                 characterName = characterNameFromId(it.characterId),
-                                lastMessage = it.createdAt.take(10) // "2025-05-28"
+                                lastMessage = it.createdAt.take(10), // 날짜
+                                title = it.title,                    // 제목
+                                dialogueText = it.dialogueText,           // 본문 내용
+                                voiceUrl = it.voiceUrl
                             )
                         }
                     )
+
                     adapter.notifyDataSetChanged()
                 } else {
                     Toast.makeText(this@TtsSaveActivity, "음성 목록 불러오기 실패", Toast.LENGTH_SHORT).show()

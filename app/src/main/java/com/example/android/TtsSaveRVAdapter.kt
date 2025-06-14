@@ -7,9 +7,12 @@ import com.example.android.databinding.ItemRecordlistBinding
 
 // 데이터 모델
 data class TtsSaveModel(
-    val voiceId: Int, // 추가
+    val voiceId: Int,
     val characterName: String,
     val lastMessage: String,
+    val title: String,     // 대사 제목
+    val dialogueText: String,   // 대사 내용
+    val voiceUrl: String,
     var isPlaying: Boolean = false
 )
 

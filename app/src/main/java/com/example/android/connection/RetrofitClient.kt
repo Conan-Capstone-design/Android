@@ -238,6 +238,11 @@ class RetrofitClient {
         val message: String
     )
 
+    data class RequestVoicePlay(
+        @SerializedName("character") val character: String,
+        @SerializedName("text") val text: String
+    )
+
     data class ResponseVoicePlay(
         @SerializedName("isSuccess") val isSuccess: Boolean,
         @SerializedName("code") val code: Int,
@@ -246,14 +251,7 @@ class RetrofitClient {
     )
 
     data class VoiceResult(
-        @SerializedName("voice_id") val voiceId: Int,
-        @SerializedName("voice") val voiceUrl: String
-    )
-
-    data class RequestVoiceSave(
-        @SerializedName("character_id") val characterId: String,
-        @SerializedName("voice") val voiceUrl: String,
-        @SerializedName("dialogue_text") val dialogueText: String
+        @SerializedName("voice_url") val voiceUrl: String
     )
 
     data class ResponseVoiceSave(
@@ -261,12 +259,6 @@ class RetrofitClient {
         @SerializedName("code") val code: String,
         @SerializedName("message") val message: String,
         @SerializedName("result") val result: JsonObject?
-    )
-
-    data class ResponseVoiceDelete(
-        @SerializedName("isSuccess") val isSuccess: Boolean,
-        @SerializedName("code") val code: Int,
-        @SerializedName("message") val message: String
     )
 
     data class ResponseVoiceAll(
@@ -281,8 +273,14 @@ class RetrofitClient {
         @SerializedName("voice_id") val voiceId: Int,
         @SerializedName("character_id") val characterId: Int,
         @SerializedName("voice") val voiceUrl: String,
+        @SerializedName("title") val title: String,
         @SerializedName("dialogue_text") val dialogueText: String,
         @SerializedName("created_at") val createdAt: String
     )
 
+    data class ResponseVoiceDelete(
+        @SerializedName("isSuccess") val isSuccess: Boolean,
+        @SerializedName("code") val code: Int,
+        @SerializedName("message") val message: String
+    )
 }

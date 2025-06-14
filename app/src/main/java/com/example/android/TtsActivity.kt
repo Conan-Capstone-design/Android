@@ -8,6 +8,7 @@ import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -20,9 +21,16 @@ import com.example.android.connection.RetrofitClient
 import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ActivityTtsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
 
 class TtsActivity : AppCompatActivity() {
 
@@ -57,22 +65,25 @@ class TtsActivity : AppCompatActivity() {
             btnPlay.visibility = View.GONE
             btnPause.visibility = View.VISIBLE
 
-            // 이미 mediaPlayer가 있고 일시정지된 경우 → 이어서 재생
+            // 일시정지된 경우 재생
             if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
                 mediaPlayer?.start()
                 return@setOnClickListener
             }
 
             val token = MyApplication.getUser().getString("jwt", null)
-            val characterId = intent.getIntExtra("character_id", 0)
+
+            val character = intent.getStringExtra("character_name") ?: "케로로"
             val dialogueText = binding.etScript.text.toString()
 
-            if (token.isNullOrBlank() || characterId == 0 || dialogueText.isBlank()) {
-                Toast.makeText(this@TtsActivity, "로그인 또는 대사를 확인해주세요.", Toast.LENGTH_SHORT).show()
+            if (token.isNullOrBlank() || dialogueText.isBlank()) {
+                Toast.makeText(this@TtsActivity, "문장을 입력해주세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val call = RetrofitObject.getRetrofitService.playVoice(token, characterId)
+            val request = RetrofitClient.RequestVoicePlay(character, dialogueText)
+            val call = RetrofitObject.getRetrofitService.playVoice(token, request)
+
             call.enqueue(object : Callback<RetrofitClient.ResponseVoicePlay> {
                 override fun onResponse(
                     call: Call<RetrofitClient.ResponseVoicePlay>,
@@ -81,13 +92,10 @@ class TtsActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body()?.isSuccess == true) {
                         val voiceUrl = response.body()?.result?.voiceUrl
 
-                        // 재생 중이던 게 있다면 release 먼저
                         mediaPlayer?.release()
-
-                        // MediaPlayer로 S3 URL 재생
                         mediaPlayer = MediaPlayer().apply {
                             setDataSource(voiceUrl)
-                            setOnPreparedListener { start() } // 준비되면 자동 시작
+                            setOnPreparedListener { start() }
                             setOnCompletionListener {
                                 btnPause.visibility = View.GONE
                                 btnPlay.visibility = View.VISIBLE
@@ -95,7 +103,6 @@ class TtsActivity : AppCompatActivity() {
                             prepareAsync()
                         }
 
-                        // 재생이 완료된 S3 링크를 변수로 저장
                         savedVoiceUrl = voiceUrl ?: ""
                     } else {
                         Toast.makeText(this@TtsActivity, "음성 생성 실패", Toast.LENGTH_SHORT).show()
@@ -119,39 +126,75 @@ class TtsActivity : AppCompatActivity() {
             }
         }
 
-        btnDownload.setOnClickListener {
+        binding.btnDownload.setOnClickListener {
             val token = MyApplication.getUser().getString("jwt", null)
+            Log.d("TTS_DEBUG", "JWT Token: $token")
             val characterId = intent.getIntExtra("character_id", 0)
-            val dialogueText = binding.etScript.text.toString()
+            val titleText = binding.etTitle.text.toString()        // 제목
+            val contentText = binding.etScript.text.toString()     // 본문
 
-            if (token.isNullOrBlank() || characterId == 0 || dialogueText.isBlank() || savedVoiceUrl.isBlank()) {
+            // 저장할 음성 파일이 없는 경우
+            if (token.isNullOrBlank() || characterId == 0 || titleText.isBlank() || contentText.isBlank() || savedVoiceUrl.isBlank()) {
                 Toast.makeText(this@TtsActivity, "음성 생성 후 저장할 수 있습니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val request = RetrofitClient.RequestVoiceSave(
-                characterId = characterId.toString(),
-                voiceUrl = savedVoiceUrl,
-                dialogueText = dialogueText
+            // 음성 파일 다운로드 → 임시 파일로 저장
+            Thread {
+                try {
+                    val inputStream = URL(savedVoiceUrl).openStream()
+                    val audioFile = File(cacheDir, "voice_${System.currentTimeMillis()}.wav")
+                    FileOutputStream(audioFile).use { output -> inputStream.copyTo(output) }
+
+                    runOnUiThread {
+                        uploadVoiceToServer(token, characterId, titleText, contentText, audioFile)
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this@TtsActivity, "파일 저장 오류: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }.start()
+
+
+            // Multipart 전송용 파라미터 구성
+            /*val characterIdPart = characterId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val titlePart = titleText.toRequestBody("text/plain".toMediaTypeOrNull())           // 제목
+            val dialogueTextPart = contentText.toRequestBody("text/plain".toMediaTypeOrNull())  // 본문
+
+            val voicePart = MultipartBody.Part.createFormData(
+                name = "voice",
+                filename = audioFile.name,
+                body = audioFile.asRequestBody("audio/wav".toMediaTypeOrNull())
             )
 
-            val call = RetrofitObject.getRetrofitService.voiceSave(token, request)
+            val call = RetrofitObject.getRetrofitService.voiceSaveMultipart(
+                token = token,
+                characterId = characterIdPart,
+                voice = voicePart,
+                title = titlePart,               // 제목
+                dialogueText = dialogueTextPart      // 본문
+            )
+
             call.enqueue(object : Callback<RetrofitClient.ResponseVoiceSave> {
                 override fun onResponse(
                     call: Call<RetrofitClient.ResponseVoiceSave>,
                     response: Response<RetrofitClient.ResponseVoiceSave>
                 ) {
+                    Log.d("TTS_DEBUG", "Response code: ${response.code()}, message: ${response.message()}")
                     if (response.isSuccessful && response.body()?.isSuccess == true) {
-                        showToast()
+                        showToast() // 저장 성공 토스트
                     } else {
+                        Log.d("TTS_DEBUG", "Response body: ${response.body()}")
                         Toast.makeText(this@TtsActivity, "저장 실패", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<RetrofitClient.ResponseVoiceSave>, t: Throwable) {
+                    Log.e("TTS_DEBUG", "Server error: ${t.message}", t)
                     Toast.makeText(this@TtsActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
-            })
+            })*/
         }
     }
 
@@ -208,4 +251,47 @@ class TtsActivity : AppCompatActivity() {
         mediaPlayer?.release()
         mediaPlayer = null
     }
+
+    private fun uploadVoiceToServer(
+        token: String,
+        characterId: Int,
+        titleText: String,
+        contentText: String,
+        audioFile: File
+    ) {
+        val characterIdPart = characterId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val titlePart = titleText.toRequestBody("text/plain".toMediaTypeOrNull())
+        val dialogueTextPart = contentText.toRequestBody("text/plain".toMediaTypeOrNull())
+        val voicePart = MultipartBody.Part.createFormData(
+            name = "voice",
+            filename = audioFile.name,
+            body = audioFile.asRequestBody("audio/wav".toMediaTypeOrNull())
+        )
+
+        val call = RetrofitObject.getRetrofitService.voiceSaveMultipart(
+            token = token,
+            characterId = characterIdPart,
+            voice = voicePart,
+            title = titlePart,
+            dialogueText = dialogueTextPart
+        )
+
+        call.enqueue(object : Callback<RetrofitClient.ResponseVoiceSave> {
+            override fun onResponse(
+                call: Call<RetrofitClient.ResponseVoiceSave>,
+                response: Response<RetrofitClient.ResponseVoiceSave>
+            ) {
+                if (response.isSuccessful && response.body()?.isSuccess == true) {
+                    showToast()
+                } else {
+                    Toast.makeText(this@TtsActivity, "저장 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<RetrofitClient.ResponseVoiceSave>, t: Throwable) {
+                Toast.makeText(this@TtsActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
 }

@@ -51,14 +51,14 @@ interface RetrofitAPI {
         @Query("characterName") characterName: String
     ): Call<RetrofitClient.ResponseMypageTTS>
 
-    @DELETE("mypage/voice-list/byChar/delete")
+    @DELETE("/mypage/voice-list/byChar/delete")
     fun mypageTTSDelete(
         @Header("x-access-token") token: String,
         @Query("characterName") characterName: String,
         @Query("voiceId") voiceId: Int
     ): Call<RetrofitClient.ResponseMypageTTSDelete>
 
-    @GET("mypage/voice-list")
+    @GET("/mypage/voice-list")
     fun MypageTTSlistGet(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseTTSListGet>
 
     @POST("/user/sign-up")
@@ -67,23 +67,27 @@ interface RetrofitAPI {
     @POST("/user/withdraw")
     fun withdrawUser(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseWithdraw>
 
-    @GET("/tts/voice-play/{voice_id}")
+    @POST("/tts/play")
     fun playVoice(
         @Header("x-access-token") token: String,
-        @Path("voice_id") voiceId: Int): Call<RetrofitClient.ResponseVoicePlay>
+        @Body request: RetrofitClient.RequestVoicePlay): Call<RetrofitClient.ResponseVoicePlay>
 
+    @Multipart
     @POST("/tts/voice-save")
-    fun voiceSave(
+    fun voiceSaveMultipart(
         @Header("x-access-token") token: String,
-        @Body request: RetrofitClient.RequestVoiceSave): Call<RetrofitClient.ResponseVoiceSave>
+        @Part("character_id") characterId: RequestBody,
+        @Part voice: MultipartBody.Part,
+        @Part("title") title: RequestBody,
+        @Part("dialogue_text") dialogueText: RequestBody): Call<RetrofitClient.ResponseVoiceSave>
+
+    @GET("/tts/voice-all")
+    fun getAllVoices(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseVoiceAll>
 
     @DELETE("/tts/voice-delete/{voice_id}")
     fun deleteVoice(
         @Header("x-access-token") token: String,
         @Path("voice_id") voiceId: Int): Call<RetrofitClient.ResponseVoiceDelete>
-
-    @GET("/tts/voice-all")
-    fun getAllVoices(@Header("x-access-token") token: String): Call<RetrofitClient.ResponseVoiceAll>
 
     @Multipart
     @POST("/llvc/video-convert")

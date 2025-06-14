@@ -168,12 +168,12 @@
         android:id="@+id/btn_pause"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="18dp"
         android:background="@drawable/tts_pause"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_download"
-        app:layout_constraintStart_toEndOf="@+id/btn_share"/>
+        app:layout_constraintStart_toEndOf="@+id/btn_share"
+        app:layout_constraintTop_toBottomOf="@+id/iv_bg_wave"/>
 
     <!-- 다운로드 버튼 -->
     <ImageButton

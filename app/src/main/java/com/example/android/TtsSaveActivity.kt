@@ -109,9 +109,10 @@ class TtsSaveActivity : AppCompatActivity() {
 
     private fun showDeleteDialog() {
         // 배경 어둡게 처리
-        val dialogView = layoutInflater.inflate(R.layout.dialog_delete, null)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete2, null)
 //        val dialogView = DialogDeleteBinding.inflate(LayoutInflater.from(this))
 
+        Log.d("dialogview", "dialogview click")
         // AlertDialog.Builder를 사용하여 다이얼로그 생성
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
@@ -177,6 +178,7 @@ class TtsSaveActivity : AppCompatActivity() {
             }
             alertDialog.dismiss()
         }
+        alertDialog.show()
     }
 
     private fun removeDialogOverlay(dialogContainer: FrameLayout) {

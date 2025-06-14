@@ -1,13 +1,18 @@
 package com.example.android
 
+import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.connection.RetrofitClient
@@ -21,104 +26,38 @@ import retrofit2.Response
 class TtsSaveActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTtssaveBinding
     private lateinit var adapter: TtsSaveRVAdapter
-    private val ttssaveList = mutableListOf<TtsSaveModel>()
     private var mediaPlayer: MediaPlayer? = null
     private var currentlyPlayingIndex: Int? = null
-
+    private var clickedItemPosition = -1
+    private var clickedVoiceId = -1
+    private lateinit var user: SharedPreferences
+    private lateinit var token: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTtssaveBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        user = MyApplication.getUser()
+        token = user.getString("jwt", "").toString()
+
+        val character = intent.getStringExtra("character_name") ?: "케로로"
+        binding.listTitleTv.text = character
+
+        loadVoiceListFromServer()
 
         binding.listBackBtn.setOnClickListener {
             finish()
         }
 
-        adapter = TtsSaveRVAdapter(
-            ttssaveList,
-            onDeleteClick = { position -> showDeleteDialog(position) },
-            onPlayClick = { position ->
-
-                val item = ttssaveList[position]
-                val token = MyApplication.getUser().getString("jwt", null) ?: return@TtsSaveRVAdapter
-
-                // 이미 재생 중인 항목을 다시 누르면 정지
-                if (item.isPlaying) {
-                    mediaPlayer?.pause()
-                    item.isPlaying = false
-                    adapter.notifyItemChanged(position)
-                    currentlyPlayingIndex = null
-                    return@TtsSaveRVAdapter
-                }
-
-                // 이전 재생 중인 항목 정지
-                currentlyPlayingIndex?.let { idx ->
-                    ttssaveList[idx].isPlaying = false
-                    adapter.notifyItemChanged(idx)
-                }
-                mediaPlayer?.release()
-                mediaPlayer = null
-
-                // 음성 재생 요청
-                val request = RetrofitClient.RequestVoicePlay(
-                    character = item.characterName,
-                    text = item.dialogueText
-                )
-                val call = RetrofitObject.getRetrofitService.playVoice(token, request)
-
-                call.enqueue(object : Callback<RetrofitClient.ResponseVoicePlay> {
-                    override fun onResponse(
-                        call: Call<RetrofitClient.ResponseVoicePlay>,
-                        response: Response<RetrofitClient.ResponseVoicePlay>
-                    ) {
-                        if (response.isSuccessful && response.body()?.isSuccess == true) {
-                            val url = response.body()?.result?.voiceUrl
-                            Log.d("TTS_DEBUG", "재생할 voiceUrl: $url")
-
-                            try {
-                                if (url.isNullOrBlank() || url.contains("undefined")) {
-                                    Toast.makeText(this@TtsSaveActivity, "재생할 파일이 없습니다.", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
-
-                                mediaPlayer = MediaPlayer().apply {
-                                    setDataSource(url)
-                                    setOnPreparedListener {
-                                        start()
-                                        item.isPlaying = true
-                                        adapter.notifyItemChanged(position)
-                                        currentlyPlayingIndex = position
-                                    }
-                                    setOnCompletionListener {
-                                        item.isPlaying = false
-                                        adapter.notifyItemChanged(position)
-                                        currentlyPlayingIndex = null
-                                    }
-                                    prepareAsync()
-                                }
-                            } catch (e: Exception) {
-                                Log.e("TTS_DEBUG", "MediaPlayer 오류: ${e.message}", e)
-                                Toast.makeText(this@TtsSaveActivity, "음성 재생 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-                                item.isPlaying = false
-                                adapter.notifyItemChanged(position)
-                            }
-                        } else {
-                            Toast.makeText(this@TtsSaveActivity, "재생 실패", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<RetrofitClient.ResponseVoicePlay>, t: Throwable) {
-                        Toast.makeText(this@TtsSaveActivity, "오류: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            }
-        )
+        // 어댑터 초기화 시 콜백 전달
+        adapter = TtsSaveRVAdapter { voiceId, position ->
+            clickedVoiceId = voiceId
+            clickedItemPosition = position
+            showDeleteDialog()
+        }
 
         binding.listListRv.layoutManager = LinearLayoutManager(this)
         binding.listListRv.adapter = adapter
-
-        loadVoiceListFromServer()
 
         // 임시 데이터 추가
         /*ttssaveList.addAll(
@@ -127,12 +66,13 @@ class TtsSaveActivity : AppCompatActivity() {
                 TtsSaveModel(-2, "케로로", "2025-01-13")
             )
         )*/
-        adapter.notifyDataSetChanged()
+//        adapter.notifyDataSetChanged()
 
     }
 
     private fun loadVoiceListFromServer() {
-        val token = MyApplication.getUser().getString("jwt", null) ?: return
+        val selectedCharacterId = intent.getIntExtra("character_id", 0) // 전달받은 character_id
+
         val call = RetrofitObject.getRetrofitService.getAllVoices(token)
         call.enqueue(object : Callback<RetrofitClient.ResponseVoiceAll> {
             override fun onResponse(
@@ -140,23 +80,14 @@ class TtsSaveActivity : AppCompatActivity() {
                 response: Response<RetrofitClient.ResponseVoiceAll>
             ) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    val items = response.body()!!.result
-                    ttssaveList.clear()
+                    val allItems = response.body()?.result ?: emptyList()
 
-                    ttssaveList.addAll(
-                        items.map {
-                            TtsSaveModel(
-                                voiceId = it.voiceId,
-                                characterName = characterNameFromId(it.characterId),
-                                lastMessage = it.createdAt.take(10), // 날짜
-                                title = it.title,                    // 제목
-                                dialogueText = it.dialogueText,           // 본문 내용
-                                voiceUrl = it.voiceUrl
-                            )
-                        }
-                    )
+                    // character_id가 일치하는 항목만 필터링
+                    val filteredItems = allItems.filter { it.characterId == selectedCharacterId }
 
-                    adapter.notifyDataSetChanged()
+                    Log.d("RetrofitTTS", "Filtered items (character_id=$selectedCharacterId): $filteredItems")
+
+                    adapter.updateChatList(filteredItems)
                 } else {
                     Toast.makeText(this@TtsSaveActivity, "음성 목록 불러오기 실패", Toast.LENGTH_SHORT).show()
                 }
@@ -168,6 +99,7 @@ class TtsSaveActivity : AppCompatActivity() {
         })
     }
 
+
     private fun characterNameFromId(id: Int): String = when (id) {
         1 -> "코난"
         2 -> "짱구"
@@ -175,77 +107,75 @@ class TtsSaveActivity : AppCompatActivity() {
         else -> "알 수 없음"
     }
 
-    private fun showDeleteDialog(position: Int) {
+    private fun showDeleteDialog() {
         // 배경 어둡게 처리
-        binding.root.setBackgroundColor(getColor(R.color.Gray700))
-        binding.root.alpha = 0.4f
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete, null)
+//        val dialogView = DialogDeleteBinding.inflate(LayoutInflater.from(this))
 
-        val dialogView = DialogDeleteBinding.inflate(LayoutInflater.from(this))
+        // AlertDialog.Builder를 사용하여 다이얼로그 생성
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+        val alertDialog: AlertDialog = builder.create()
 
-        //다이얼로그 중앙 정렬 처리
-        val layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.gravity = Gravity.CENTER
-        dialogView.root.layoutParams = layoutParams
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val dialogContainer = FrameLayout(this)
-        dialogContainer.addView(dialogView.root)
+        // Window 속성을 사용하여 크기 조절
+        val layoutParams = WindowManager.LayoutParams()
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT // 원하는 폭으로 설정
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT // 원하는 높이로 설정
+        alertDialog.window?.attributes = layoutParams
 
-        // 다이얼로그 레이아웃 오버레이
-        addContentView(
-            dialogContainer,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-        )
-        dialogContainer.setOnClickListener { }
+        // 다이얼로그 내부의 ImageButton 참조
+        val cancelButton = dialogView.findViewById<ImageButton>(R.id.btnCancel)
+        val confirmButton = dialogView.findViewById<ImageButton>(R.id.btnDelete)
 
-        dialogView.btnCancel.setOnClickListener {
-            (dialogContainer.parent as? FrameLayout)?.removeView(dialogContainer)
-            binding.root.setBackgroundColor(Color.TRANSPARENT)
-            binding.root.alpha = 1.0f
+        // 취소 버튼 클릭 리스너 설정
+        cancelButton.setOnClickListener {
+            // 취소 버튼을 눌렀을 때 수행할 동작
+            alertDialog.dismiss() // 다이얼로그 닫기
+            // 추가적인 작업 수행 가능
         }
 
-        dialogView.btnDelete.setOnClickListener {
-            val token = MyApplication.getUser().getString("jwt", null)
-            val voiceId = ttssaveList[position].voiceId
-
-            //더미데이터 방어코드
-            /*if (voiceId <= 0) {
-                Toast.makeText(this, "유효하지 않은 음성입니다.", Toast.LENGTH_SHORT).show()
-                removeDialogOverlay(dialogContainer)
-                return@setOnClickListener
-            }*/
-
-            if (token != null) {
-                val call = RetrofitObject.getRetrofitService.deleteVoice(token, voiceId)
-                call.enqueue(object : Callback<RetrofitClient.ResponseVoiceDelete> {
-                    override fun onResponse(
-                        call: Call<RetrofitClient.ResponseVoiceDelete>,
-                        response: Response<RetrofitClient.ResponseVoiceDelete>
-                    ) {
-                        if (response.isSuccessful && response.body()?.isSuccess == true) {
-                            Toast.makeText(this@TtsSaveActivity, "삭제 완료", Toast.LENGTH_SHORT).show()
-                            ttssaveList.removeAt(position)
-                            adapter.notifyItemRemoved(position)
-                        } else {
-                            Toast.makeText(this@TtsSaveActivity, "삭제 실패: ${response.body()?.message}", Toast.LENGTH_SHORT).show()
+        confirmButton.setOnClickListener {
+            if (clickedItemPosition != -1 && clickedVoiceId != -1) {
+                RetrofitObject.getRetrofitService
+                    .deleteVoice(token, clickedVoiceId)
+                    .enqueue(object : Callback<RetrofitClient.ResponseVoiceDelete> {
+                        override fun onResponse(
+                            call: Call<RetrofitClient.ResponseVoiceDelete>,
+                            response: Response<RetrofitClient.ResponseVoiceDelete>
+                        ) {
+                            if (response.isSuccessful && response.body()?.isSuccess == true) {
+                                adapter.removeItem(clickedItemPosition)
+                                Toast.makeText(
+                                    this@TtsSaveActivity,
+                                    "삭제되었습니다",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    this@TtsSaveActivity,
+                                    "삭제 실패",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            resetDeleteState()
                         }
-                        removeDialogOverlay(dialogContainer)
-                    }
 
-                    override fun onFailure(call: Call<RetrofitClient.ResponseVoiceDelete>, t: Throwable) {
-                        Toast.makeText(this@TtsSaveActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
-                        removeDialogOverlay(dialogContainer)
-                    }
-                })
-            } else {
-                Toast.makeText(this@TtsSaveActivity, "로그인 정보 없음", Toast.LENGTH_SHORT).show()
-                removeDialogOverlay(dialogContainer)
+                        override fun onFailure(
+                            call: Call<RetrofitClient.ResponseVoiceDelete>,
+                            t: Throwable
+                        ) {
+                            Toast.makeText(
+                                this@TtsSaveActivity,
+                                "네트워크 오류: ${t.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            resetDeleteState()
+                        }
+                    })
             }
+            alertDialog.dismiss()
         }
     }
 
@@ -255,9 +185,14 @@ class TtsSaveActivity : AppCompatActivity() {
         binding.root.alpha = 1.0f
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer?.release()
-        mediaPlayer = null
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//    }
+
+    private fun resetDeleteState() {
+        clickedItemPosition = -1
+        clickedVoiceId = -1
     }
 }

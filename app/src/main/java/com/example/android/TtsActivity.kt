@@ -56,7 +56,12 @@ class TtsActivity : AppCompatActivity() {
     private fun setupListeners() = with(binding) {
         ibArrowBack.setOnClickListener { finish() }
         ibMenu.setOnClickListener {
-            startActivity(Intent(this@TtsActivity, TtsSaveActivity::class.java))
+            val characterName = intent.getStringExtra("character_name") ?: "케로로"
+            val characterId = intent.getIntExtra("character_id", 0)
+            val newIntent = Intent(this@TtsActivity, TtsSaveActivity::class.java)
+            newIntent.putExtra("character_name", characterName)
+            newIntent.putExtra("character_id", characterId)
+            startActivity(newIntent)
         }
         btnClear.setOnClickListener { etScript.text.clear() }
         btnShare.setOnClickListener { showShareBottomSheet() }

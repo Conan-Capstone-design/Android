@@ -1,70 +1,120 @@
 package com.example.android
 
+import android.media.MediaPlayer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.connection.RetrofitClient
 import com.example.android.databinding.ItemRecordlistBinding
 
 // 데이터 모델
-data class TtsSaveModel(
-    val voiceId: Int,
-    val characterName: String,
-    val lastMessage: String,
-    val title: String,     // 대사 제목
-    val dialogueText: String,   // 대사 내용
-    val voiceUrl: String,
-    var isPlaying: Boolean = false
-)
-
 class TtsSaveRVAdapter(
-    private val saveList: MutableList<TtsSaveModel>,
-    private val onDeleteClick: (Int) -> Unit,
-    private val onPlayClick: (Int) -> Unit  // 추가
+    private val onDeleteClick: (voiceId: Int, position: Int) -> Unit
 ) : RecyclerView.Adapter<TtsSaveRVAdapter.ChatViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val binding = ItemRecordlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    private val itemList = mutableListOf<RetrofitClient.VoiceItem>()
+    fun updateChatList(newList: List<RetrofitClient.VoiceItem>) {
+        itemList.clear()
+        itemList.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        if (position in itemList.indices) {
+            itemList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TtsSaveRVAdapter.ChatViewHolder {
+        val binding =
+            ItemRecordlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ChatViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        holder.bind(saveList[position])
+    override fun onBindViewHolder(holder: TtsSaveRVAdapter.ChatViewHolder, position: Int) {
+        holder.bind(itemList[position])
     }
 
-    override fun getItemCount(): Int = saveList.size
+    override fun getItemCount(): Int = itemList.size
+
 
     inner class ChatViewHolder(private val binding: ItemRecordlistBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        private var isPlaying = false
+        private var mediaPlayer: MediaPlayer? = null
 
-        fun bind(item: TtsSaveModel) = with(binding) {
-            itemChattitleTv.text = item.characterName
-            itemDateTv.text = item.lastMessage
+        fun bind(item: RetrofitClient.VoiceItem) = with(binding) {
+            itemChattitleTv.text = item.dialogueText
+            itemDateTv.text = item.createdAt.substringBefore("T").replace("-", ".")
 
+            updateUI()
+
+            character01Layout.setOnClickListener {
+                if (isPlaying) {
+                    stopPlayback()
+                } else {
+                    startPlayback(item.voiceUrl)
+                }
+                isPlaying = !isPlaying
+                updateUI()
+            }
+
+            imageView20.setOnClickListener {
+                val voiceId = item.voiceId
+                if (voiceId != null) {
+                    onDeleteClick(voiceId, adapterPosition)
+                }
+            }
+
+        }
+
+        private fun startPlayback(url: String) {
+            mediaPlayer = MediaPlayer()
+            try {
+                mediaPlayer?.apply {
+                    setDataSource(url)
+                    setOnPreparedListener {
+                        start()
+                    }
+                    setOnCompletionListener {
+                        this@ChatViewHolder.isPlaying = false
+                        this@ChatViewHolder.updateUI()
+                        release()
+                        this@ChatViewHolder.mediaPlayer = null
+                    }
+                    prepareAsync()
+                }
+            } catch (e: Exception) {
+                Log.e("MediaPlayerError", "Failed to play audio: ${e.message}")
+            }
+        }
+
+        private fun stopPlayback() {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+        }
+
+        private fun updateUI() = with(binding) {
             character01Layout.setImageResource(
-                if (item.isPlaying) R.drawable.ic_pause_blue else R.drawable.ic_start
+                if (isPlaying) R.drawable.ic_pause_blue else R.drawable.ic_start
             )
             root.setBackgroundResource(
-                if (item.isPlaying) R.drawable.border_highlight_conan else R.drawable.border_highlight_gray
+                if (isPlaying) R.drawable.border_highlight_conan else R.drawable.border_highlight_gray
             )
             imageView20.setImageResource(
-                if (item.isPlaying) R.drawable.trash_blue else R.drawable.trash_gray
+                if (isPlaying) R.drawable.trash_blue else R.drawable.trash_gray
             )
 
-            val textColor = if (item.isPlaying) {
+            val textColor = if (isPlaying) {
                 root.context.getColor(R.color.conan03)
             } else {
                 root.context.getColor(R.color.Gray800)
             }
             itemChattitleTv.setTextColor(textColor)
             itemDateTv.setTextColor(textColor)
-
-            character01Layout.setOnClickListener {
-                onPlayClick(adapterPosition)
-            }
-
-            imageView20.setOnClickListener {
-                onDeleteClick(adapterPosition)
-            }
         }
     }
 }

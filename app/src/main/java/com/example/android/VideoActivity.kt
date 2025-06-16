@@ -3,6 +3,7 @@ package com.example.android
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,6 +17,10 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.commit
 import com.example.android.connection.RetrofitObject
 import com.example.android.databinding.ActivityVideoBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -33,43 +38,13 @@ class VideoActivity : AppCompatActivity() {
     private var selectedVideoUri: Uri? = null
     private var convertedVideoUri: Uri? = null
     private var isConverted = false
-
-    private val videoPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
-            selectedVideoUri = data?.data
-            if (selectedVideoUri != null) {
-                binding.btnConvert.isEnabled = true
-                updateBtnConvertStyle()
-
-                binding.btnUpload.isEnabled = false
-
-                // 영상 표시
-                binding.videoView.apply {
-                    visibility = View.VISIBLE
-                    setVideoURI(selectedVideoUri)
-                    seekTo(1)  // 썸네일처럼 첫 프레임 표시
-                }
-
-                // 버튼 표시
-                binding.btnPlayVideo.visibility = View.VISIBLE
-                binding.btnDeleteVideo.visibility = View.VISIBLE
-
-
-                // 위치 이동
-                binding.tvConvertedLabel.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topMargin = 131.dpToPx()
-                }
-                binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topMargin = 7.dpToPx()
-                }
-
-            }
-        }
-    }
+    private lateinit var user: SharedPreferences
+    private lateinit var token: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        user = MyApplication.getUser()
+        token = user.getString("jwt", "").toString()
 
         binding = ActivityVideoBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -121,13 +96,14 @@ class VideoActivity : AppCompatActivity() {
         }
 
         binding.btnConvert.setOnClickListener {
-            val token = MyApplication.getUser().getString("jwt", null)
             val uri = selectedVideoUri
 
             if (token.isNullOrBlank() || uri == null) {
                 Toast.makeText(this, "먼저 영상을 업로드하세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            Toast.makeText(this, "비디오 변환 중입니다. 잠시만 기다려주세요...", Toast.LENGTH_SHORT).show()
 
             val inputStream = contentResolver.openInputStream(uri)
             val file = File(cacheDir, "upload_video_${System.currentTimeMillis()}.mp4")
@@ -146,56 +122,53 @@ class VideoActivity : AppCompatActivity() {
             call.enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     if (response.isSuccessful && response.body() != null) {
-                        // 서버로부터 받은 mp4 파일 저장
-                        val convertedFile = File(cacheDir, "converted_${System.currentTimeMillis()}.mp4")
-                        response.body()?.byteStream()?.use { input ->
-                            FileOutputStream(convertedFile).use { output -> input.copyTo(output) }
+                        // 백그라운드에서 저장 작업 수행
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val convertedFile = File(cacheDir, "converted_${System.currentTimeMillis()}.mp4")
+                            response.body()?.byteStream()?.use { input ->
+                                FileOutputStream(convertedFile).use { output -> input.copyTo(output) }
+                            }
+
+                            // UI 업데이트는 메인 스레드에서
+                            withContext(Dispatchers.Main) {
+                                convertedVideoUri = Uri.fromFile(convertedFile)
+
+                                binding.videoView2.apply {
+                                    visibility = View.VISIBLE
+                                    setVideoURI(convertedVideoUri)
+                                    seekTo(1)
+                                }
+
+                                binding.btnSave.isEnabled = true
+                                isConverted = true
+
+                                binding.btnPlayVideo2.visibility = View.VISIBLE
+                                binding.btnPauseVideo2.visibility = View.GONE
+
+                                binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                    topMargin = 164.dpToPx()
+                                }
+
+                                binding.videoView2.setOnCompletionListener {
+                                    binding.btnPauseVideo2.visibility = View.GONE
+                                    binding.btnPlayVideo2.visibility = View.VISIBLE
+                                    binding.videoView2.seekTo(1)
+                                }
+
+                                binding.btnPlayVideo2.setOnClickListener {
+                                    binding.videoView2.start()
+                                    binding.btnPlayVideo2.visibility = View.GONE
+                                    binding.btnPauseVideo2.visibility = View.VISIBLE
+                                }
+
+                                binding.btnPauseVideo2.setOnClickListener {
+                                    binding.videoView2.pause()
+                                    binding.btnPauseVideo2.visibility = View.GONE
+                                    binding.btnPlayVideo2.visibility = View.VISIBLE
+                                }
+                            }
                         }
-
-                        convertedVideoUri = Uri.fromFile(convertedFile)
-
-                        // videoView2에 영상 표시
-                        binding.videoView2.apply {
-                            visibility = View.VISIBLE
-                            setVideoURI(convertedVideoUri)
-                            seekTo(1)
-                        }
-
-                        // 비디오 변환 성공한 후 저장 버튼 활성화
-                        binding.btnSave.isEnabled = true
-                        isConverted = true
-
-                        binding.btnPlayVideo2.visibility = View.VISIBLE
-                        binding.btnPauseVideo2.visibility = View.GONE
-
-                        // btnSave 위치 아래로
-                        binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            topMargin = 164.dpToPx()
-                        }
-
-                        // 변환영상
-                        binding.videoView2.setOnCompletionListener {
-                            binding.btnPauseVideo2.visibility = View.GONE
-                            binding.btnPlayVideo2.visibility = View.VISIBLE
-                            binding.videoView2.seekTo(1)
-                        }
-
-                        // 변환영상 재생 버튼
-                        binding.btnPlayVideo2.setOnClickListener {
-                            binding.videoView2.start()
-                            binding.btnPlayVideo2.visibility = View.GONE
-                            binding.btnPauseVideo2.visibility = View.VISIBLE
-                        }
-
-                        // 변환영상 일시정지 버튼
-                        binding.btnPauseVideo2.setOnClickListener {
-                            binding.videoView2.pause()
-                            binding.btnPauseVideo2.visibility = View.GONE
-                            binding.btnPlayVideo2.visibility = View.VISIBLE
-                        }
-
                     } else {
-                        // 실패 시 에러 메시지 파싱
                         val errorMsg = try {
                             val errorJson = JSONObject(response.errorBody()?.string() ?: "")
                             errorJson.optJSONObject("result")?.optString("error")
@@ -206,9 +179,10 @@ class VideoActivity : AppCompatActivity() {
                         Toast.makeText(this@VideoActivity, errorMsg, Toast.LENGTH_SHORT).show()
                     }
                 }
-
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Toast.makeText(this@VideoActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                    runOnUiThread {
+                        Toast.makeText(this@VideoActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             })
         }
@@ -286,6 +260,40 @@ class VideoActivity : AppCompatActivity() {
                 resolver.openInputStream(videoUri)?.use { inputStream ->
                     inputStream.copyTo(outputStream)
                 }
+            }
+        }
+    }
+
+    private val videoPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            selectedVideoUri = data?.data
+            if (selectedVideoUri != null) {
+                binding.btnConvert.isEnabled = true
+                updateBtnConvertStyle()
+
+                binding.btnUpload.isEnabled = false
+
+                // 영상 표시
+                binding.videoView.apply {
+                    visibility = View.VISIBLE
+                    setVideoURI(selectedVideoUri)
+                    seekTo(1)  // 썸네일처럼 첫 프레임 표시
+                }
+
+                // 버튼 표시
+                binding.btnPlayVideo.visibility = View.VISIBLE
+                binding.btnDeleteVideo.visibility = View.VISIBLE
+
+
+                // 위치 이동
+                binding.tvConvertedLabel.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topMargin = 131.dpToPx()
+                }
+                binding.btnSave.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topMargin = 7.dpToPx()
+                }
+
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.android
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -33,7 +34,8 @@ import java.io.FileOutputStream
 import java.net.URL
 
 class TtsActivity : AppCompatActivity() {
-
+    private lateinit var user: SharedPreferences
+    private lateinit var token: String
     private lateinit var binding: ActivityTtsBinding
     private var savedVoiceUrl: String = ""
     private var mediaPlayer: MediaPlayer? = null
@@ -42,6 +44,9 @@ class TtsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityTtsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        user = MyApplication.getUser()
+        token = user.getString("jwt", "").toString()
 
         setupViews()
         setupListeners()
@@ -76,8 +81,6 @@ class TtsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val token = MyApplication.getUser().getString("jwt", null)
-
             val character = intent.getStringExtra("character_name") ?: "케로로"
             val dialogueText = binding.etScript.text.toString()
 
@@ -85,6 +88,8 @@ class TtsActivity : AppCompatActivity() {
                 Toast.makeText(this@TtsActivity, "문장을 입력해주세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            Toast.makeText(this@TtsActivity,"음성 변환 중입니다. 잠시만 기다려주세요...", Toast.LENGTH_SHORT).show()
 
             val request = RetrofitClient.RequestVoicePlay(character, dialogueText)
             val call = RetrofitObject.getRetrofitService.playVoice(token, request)
@@ -96,7 +101,6 @@ class TtsActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful && response.body()?.isSuccess == true) {
                         val voiceUrl = response.body()?.result?.voiceUrl
-
                         mediaPlayer?.release()
                         mediaPlayer = MediaPlayer().apply {
                             setDataSource(voiceUrl)
@@ -132,7 +136,6 @@ class TtsActivity : AppCompatActivity() {
         }
 
         binding.btnDownload.setOnClickListener {
-            val token = MyApplication.getUser().getString("jwt", null)
             Log.d("TTS_DEBUG", "JWT Token: $token")
             val characterId = intent.getIntExtra("character_id", 0)
             val titleText = binding.etTitle.text.toString()        // 제목
@@ -143,6 +146,11 @@ class TtsActivity : AppCompatActivity() {
                 Toast.makeText(this@TtsActivity, "음성 생성 후 저장할 수 있습니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+//            val inputStream = URL(savedVoiceUrl).openStream()
+//            val audioFile = File(cacheDir, "voice_${System.currentTimeMillis()}.wav")
+//            FileOutputStream(audioFile).use { output -> inputStream.copyTo(output) }
+//
+//            uploadVoiceToServer(token, characterId, audioFile, titleText, contentText)
 
             // 음성 파일 다운로드 → 임시 파일로 저장
             Thread {
@@ -152,7 +160,7 @@ class TtsActivity : AppCompatActivity() {
                     FileOutputStream(audioFile).use { output -> inputStream.copyTo(output) }
 
                     runOnUiThread {
-                        uploadVoiceToServer(token, characterId, titleText, contentText, audioFile)
+                        uploadVoiceToServer(token, characterId, audioFile, titleText, contentText)
                     }
                 } catch (e: Exception) {
                     runOnUiThread {
@@ -260,9 +268,9 @@ class TtsActivity : AppCompatActivity() {
     private fun uploadVoiceToServer(
         token: String,
         characterId: Int,
+        audioFile: File,
         titleText: String,
-        contentText: String,
-        audioFile: File
+        contentText: String
     ) {
         val characterIdPart = characterId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val titlePart = titleText.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -272,6 +280,9 @@ class TtsActivity : AppCompatActivity() {
             filename = audioFile.name,
             body = audioFile.asRequestBody("audio/wav".toMediaTypeOrNull())
         )
+
+        Log.d("UPLOAD_DEBUG", "업로드 파일 이름: ${audioFile.name}")
+        Log.d("UPLOAD_DEBUG", "업로드 파일 경로: ${audioFile.absolutePath}")
 
         val call = RetrofitObject.getRetrofitService.voiceSaveMultipart(
             token = token,

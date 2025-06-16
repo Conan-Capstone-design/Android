@@ -51,7 +51,7 @@ class RecordlistRVAdapter(
         private var mediaPlayer: MediaPlayer? = null
 
         fun bind(item: RetrofitClient.MypageTTSList) = with(binding) {
-            itemChattitleTv.text = item.dialogueText
+            itemChattitleTv.text = item.title
             itemDateTv.text = item.createdAt.substringBefore("T").replace("-", ".")
 
             updateUI()

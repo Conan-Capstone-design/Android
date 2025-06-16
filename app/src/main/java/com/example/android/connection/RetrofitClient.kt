@@ -163,8 +163,8 @@ class RetrofitClient {
     data class MypageTTSList(
         @SerializedName("voice_id")
         val voiceId: String,
-        @SerializedName("dialogueText")
-        val dialogueText: String,
+        @SerializedName("title")
+        val title: String,
         @SerializedName("createdAt")
         val createdAt: String,
         @SerializedName("voice")
